@@ -49,6 +49,15 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
             vetor_nome_projeto = explode(csvLinha, ';');
             nome_projeto = vetor_nome_projeto.front();
 
+            const char *str = nome_projeto.c_str();  // string palavra deve ser convertida para const char
+            char *pch;                          // Ponteiro que indica a posição onde o caracter acentuado foi encontrado
+            //int pos;
+            pch = strstr (str,"\uFEFF");                       // Tenta encontrar caracter especial
+            //pos = pch-str;
+            nome_projeto.erase(nome_projeto.begin());          // Deve-se retirar 3 caracteres naquela posição
+            nome_projeto.erase(nome_projeto.begin());
+            nome_projeto.erase(nome_projeto.begin());
+
             // Percorre a string para encontrar um '-' e coloca mais 2
             // Travessão no latex = "---"
             while(nome_projeto.at(i)!='-'){                 // Busca a posição em que o '-' se encontra
@@ -86,14 +95,14 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 
                 novo_projeto.setBolsista_nome(Trata_maiusculo_minusculo(nome_bolsista.at(0), false));
 
-                novo_projeto.setOrientador_nome_completo(Trata_maiusculo_minusculo(csvColuna.at(2), false));
+                novo_projeto.setCurso(Trata_maiusculo_minusculo(csvColuna.at(2), false));
 
-                nome_orientador = trata_sobrenome(csvColuna.at(2));
+                novo_projeto.setOrientador_nome_completo(Trata_maiusculo_minusculo(csvColuna.at(3), false));
+
+                nome_orientador = trata_sobrenome(csvColuna.at(3));
                 novo_projeto.setOrientador_sobrenome(nome_orientador.at(1));
 
                 novo_projeto.setOrientador_nome(Trata_maiusculo_minusculo(nome_orientador.at(0), false));
-
-                novo_projeto.setCurso(Trata_maiusculo_minusculo(csvColuna.at(3), false));
 
                 novo_projeto.setTitulo(csvColuna.at(4));
 
@@ -103,7 +112,6 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 
                 novo_projeto.setEscola(Transforma_Maisculo_Minusculo(csvColuna.at(7), true));
 
-                //aux = Retira_Ponto_Final_Espaco(csvColuna.at(8), false);
                 novo_projeto.setArea_apresentacao(Trata_maiusculo_minusculo(csvColuna.at(8), false));
                 vetor.push_back(novo_projeto);
 
@@ -168,12 +176,11 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
                         << "% Curso/Escola\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getCurso(),false) << "/"
                         << Retira_Ponto_Final_Espaco(escrita.getEscola(), false) << "}\n"
-                        << "% Área/Subárea\n"
-                        << "{" << Retira_Ponto_Final_Espaco(escrita.getArea(), false) << "/"
-                        << Retira_Ponto_Final_Espaco(escrita.getArea(), false) << "}\n"
+                        << "% Área\n"
+                        << "{" << Retira_Ponto_Final_Espaco(escrita.getArea(), false)<< "}\n"
                         << "% Resumo\n"
-                        << "{}\n"
-                        << "% Palavras chave\n"
+                        << "{\\lipsum[1-3]}\n"
+                        << "% Palavras-chave\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getPalavra_chave(), true)
                         << "}\n"
                         << "% Programa de pesquisa\n"
@@ -392,6 +399,9 @@ string Trata_maiusculo_minusculo(string nome, bool palavra_chave){
     preposicao.insert("do");
     preposicao.insert("das");
     preposicao.insert("dos");
+    preposicao.insert("e");
+    preposicao.insert("em");
+    preposicao.insert("no");
 
     vector<string> nome_separado = explode(nome, ' ');             // Vetor com os nomes separados
     vector<string> nomes_tratados;                                 // Vetor com os nomes ja tratados
@@ -412,7 +422,18 @@ string Trata_maiusculo_minusculo(string nome, bool palavra_chave){
             for(int i=0; i<primeiro_nome.length();i++){
                 if(i==0){
                     aux.push_back(toupper(primeiro_nome[i],loc));       // Transforma primeira letra em maiúscula
-                }else aux.push_back(primeiro_nome[i]);                  // Outras letras não são alteradas
+                }else{
+                    if(primeiro_nome[i] == '.' && palavra_chave == false){           // Se for sigla com '.'
+                        aux.push_back(primeiro_nome[i]);                             // Inclui pontuação
+                        if(primeiro_nome[i+1] != ' ' && primeiro_nome[i+1]!= NULL){
+                            aux.push_back(toupper(primeiro_nome[i+1],loc));          // E próxima letra em maisculo
+
+                        }else{
+                            //aux.push_back(' ');
+                        }                                                            // Atualiza o valor de i
+                        i++;
+                    }else aux.push_back(primeiro_nome[i]);                           // Outras letras não são alteradas
+                }
             }
             nomes_tratados.push_back(aux);                              // Coloca string aux no vetor de nomes tratados
         }else{                                       // Caso encontre uma preposição
@@ -457,7 +478,6 @@ string Retira_Ponto_Final_Espaco(string nome, bool palavra_chave){
             nome.push_back('.');
         }
     }
-
     return nome;
 }
 /* Função para tratamento de acentos e cedilhas
