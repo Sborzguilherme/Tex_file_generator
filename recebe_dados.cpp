@@ -54,7 +54,7 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
             while(nome_projeto.at(i)!='-'){                 // Busca a posição em que o '-' se encontra
                 i++;
             }
-            nome_projeto.insert(i, "--");                   // Nessa posição são adicionas mais 2 '-'
+            nome_projeto.insert(i, "-");                   // Nessa posição são adicionas mais 2 '-'
             linha_controle++;                               // Incrementa linha de controle
         }else if(linha_controle == 1){                      // Pula segunda linha (Labels)
             linha_controle++;
@@ -203,15 +203,15 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
     // Após todas os nomes terem sido inseridos deve-se gerar a string para escrita no arquivo
     set<string>::iterator it_v = s_vida.begin();      // iterador para percorrer a estrutura set
     for(it_v; it_v != s_vida.end(); it_v++){
-        input_vida+= "\\input{" + *it_v + "}\n";
+        input_vida+= "\\input{" + *it_v + "} \\clearpage\n";
     }
     set<string>::iterator it_h = s_humanas.begin();
     for(it_h; it_h != s_humanas.end(); it_h++){
-        input_humanas+= "\\input{" + *it_h + "}\n";
+        input_humanas+= "\\input{" + *it_h + "} \\clearpage\n";
     }
     set<string>::iterator it_e = s_exatas.begin();
     for(it_e; it_e != s_exatas.end(); it_e++){
-        input_exatas+= "\\input{" + *it_e + "}\n";
+        input_exatas+= "\\input{" + *it_e + "} \\clearpage\n";
     }
 
     string dir_vida, dir_hum, dir_exa;
