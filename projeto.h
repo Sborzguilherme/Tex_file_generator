@@ -28,6 +28,8 @@ private:                    // Atributos da classe
     string palavra_chave;
     string area_apresentacao;
 
+    string Resumo;
+
 public:
     Projeto();
     string getCodigo() const;
@@ -58,6 +60,8 @@ public:
     void setArea_apresentacao(const string &value);
     string getTitulo_Projeto() const;
     void setTitulo_Projeto(const string &value);
+    string getResumo() const;
+    void setResumo(const string &value);
 };
 
 #endif // PROJETO_H

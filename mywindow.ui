@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>250</height>
+    <height>326</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>80</y>
+      <y>140</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>80</y>
+      <y>140</y>
       <width>291</width>
       <height>20</height>
      </rect>
@@ -41,7 +41,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>60</y>
+      <y>120</y>
       <width>151</width>
       <height>16</height>
      </rect>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>110</y>
+      <y>180</y>
       <width>151</width>
       <height>16</height>
      </rect>
@@ -67,7 +67,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>130</y>
+      <y>200</y>
       <width>291</width>
       <height>20</height>
      </rect>
@@ -77,7 +77,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>130</y>
+      <y>200</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -90,7 +90,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>180</y>
+      <y>250</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -102,8 +102,8 @@
    <widget class="QLabel" name="label_end">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>160</y>
+      <x>130</x>
+      <y>230</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -115,7 +115,7 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>130</x>
       <y>20</y>
       <width>131</width>
       <height>20</height>
@@ -135,6 +135,42 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Selecione diretório com os resumos</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="browse_button_3">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>80</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Browse</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="file_line_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>

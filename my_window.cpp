@@ -22,6 +22,8 @@ MyWindow::~MyWindow()
 // Função para seleção do arquivo de leitura
 void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
 {
+    static vector<Projeto>vetor_projetos;
+
     // Só permite a leitura de arquivos .csv
     QString arquivo_leitura = QFileDialog::getOpenFileName(this, tr("Arquivo de Leitura"), ui->file_line->text(), tr("CSV (*.csv)"));
     // O caminho lido é salvo na variável arquivo_leitura
@@ -30,15 +32,30 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     }
     ui->label_end->setVisible(false);
 
+    le_projetos(ui->file_line->text().toStdString(), vetor_projetos);   // Preenche vetor de projetos a partir do arquivo CSV
+    //Define_Resumo(ui->file_line_3->text().toStdString(), vetor_projetos);
+    this->setVetor_projetos(vetor_projetos);
+
 }
 void MyWindow::on_browse_button_2_clicked() // Botão browse de escrita
 {
+
     // Retornar o diretório de escrita
     QString diretorio_escrita = QFileDialog::getExistingDirectory(this);
 
     if(!diretorio_escrita.isEmpty()){
         ui->file_line_2->setText(diretorio_escrita);
     }
+}
+
+vector<Projeto> MyWindow::getVetor_projetos() const
+{
+    return vetor_projetos;
+}
+
+void MyWindow::setVetor_projetos(const vector<Projeto> &value)
+{
+    vetor_projetos = value;
 }
 
 void MyWindow::on_file_generate_button_clicked()
@@ -53,7 +70,7 @@ void MyWindow::on_file_generate_button_clicked()
     cria_dir_vida = diretorio_escrita + "/vida";
     cria_dir_hum = diretorio_escrita + "/humanas";
     cria_dir_exa = diretorio_escrita + "/exatas";
-    vector <Projeto> vetor_projetos;                                   // Vetor do tipo da classe "Projeto"
+    //vector <Projeto> vetor_projetos;                                   // Vetor do tipo da classe "Projeto"
 
     dir_vida = cria_dir_vida.c_str();
     dir_humanas = cria_dir_hum.c_str();
@@ -61,8 +78,16 @@ void MyWindow::on_file_generate_button_clicked()
 
     // Criação dos diretórios para armazenar os arquivos gerados
     mkdir(dir_vida); mkdir(dir_humanas); mkdir(dir_exatas);
-
-    le_projetos(arquivo_leitura, vetor_projetos);                       // Preenche vetor de projetos a partir do arquivo CSV
-    escreve_projetos(vetor_projetos, diretorio_escrita);                // Escreve os dados do vetor em arquivos .TEX
+    escreve_projetos(this->getVetor_projetos(), diretorio_escrita);                // Escreve os dados do vetor em arquivos .TEX
     ui->label_end->setVisible(true);
+}
+
+void MyWindow::on_browse_button_3_clicked()   // Boão browse para diretório dos resumos
+{
+    QString diretorio_escrita = QFileDialog::getExistingDirectory(this);
+
+    if(!diretorio_escrita.isEmpty()){
+        ui->file_line_3->setText(diretorio_escrita);
+    }
+
 }

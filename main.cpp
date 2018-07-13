@@ -1,4 +1,5 @@
 #include "my_window.h"
+#include "projeto.h"
 #include <QApplication>
 #include <iostream>
 

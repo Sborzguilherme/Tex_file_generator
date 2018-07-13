@@ -21,6 +21,8 @@ string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo);   // Poe  
 string Retira_Ponto_Final_Espaco(string nome, bool palavra_chave);      // Retira ponto final e espaço do fim da string
 string Retira_Acentuacao(string nome);                                  // Função para tratamento de strings acentuadas
 string Gera_string_arquivo_input(string inputs, int grande_area);       // Gera a string para arquivos de input
+string Define_Escola(string sigla);
+void Define_Resumo(string diretorio, vector<Projeto>&vetor);
 const vector<string> explode(const string& s, const char& c);           // Função para separação de strings
 
 /*Função para leitura do arquivo CSV
@@ -127,7 +129,7 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 void escreve_projetos(vector<Projeto> vetor, string arquivo){
 
     ofstream arquivo_escrita;
-    string nome, sobrenome, area_apresentacao, escreve_input;
+    string nome, sobrenome, area_apresentacao, escreve_input, escola;
     stringstream concatena;
     vector<string> identifica_nome, v_sobrenome;
     set<string>s_vida, s_humanas, s_exatas;           // Estruturas para ordenação dos autores por grande área
@@ -158,7 +160,7 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
         area_apresentacao = Transforma_Maisculo_Minusculo(area_apresentacao, false);
 
         //cout<<Retira_Ponto_Final_Espaco(escrita.getBolsista_nome(), false)<<"-"<<endl;
-
+        escola = Retira_Ponto_Final_Espaco(escrita.getEscola(), false);
         concatena.str("");
         concatena << arquivo<<"/"<<area_apresentacao<<"/"<<Transforma_Maisculo_Minusculo(sobrenome, false)
                      << "_" << Transforma_Maisculo_Minusculo(nome, false) <<".tex";
@@ -173,13 +175,15 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
                         << Retira_Ponto_Final_Espaco(escrita.getBolsista_nome(), false) << "; "
                         << Retira_Ponto_Final_Espaco(escrita.getOrientador_sobrenome(), false)
                         << ", " << Retira_Ponto_Final_Espaco(escrita.getOrientador_nome(), false) << "}\n"
-                        << "% Curso/Escola\n"
-                        << "{" << Retira_Ponto_Final_Espaco(escrita.getCurso(),false) << "/"
-                        << Retira_Ponto_Final_Espaco(escrita.getEscola(), false) << "}\n"
+                        << "% Curso\n"
+                        << "{" << Retira_Ponto_Final_Espaco(escrita.getCurso(),false) << "}\n"
+                        <<"% Escola\n"
+                        << "{" << Define_Escola(escola) << "}\n"
                         << "% Área\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getArea(), false)<< "}\n"
                         << "% Resumo\n"
-                        << "{\\lipsum[1-3]}\n"
+                        //<< "{" << escrita.getResumo()<<"}\n"
+                        <<"{\\blindtext[5][1]}\n"
                         << "% Palavras-chave\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getPalavra_chave(), true)
                         << "}\n"
@@ -237,7 +241,6 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
     exatas.open(dir_exa);
     exatas<<Gera_string_arquivo_input(input_exatas, 2);
     exatas.close();
-
 }
 /* Função para tratar sobrenomes
    Parâmetro -> nome completo
@@ -486,6 +489,8 @@ string Retira_Ponto_Final_Espaco(string nome, bool palavra_chave){
 */
 string Retira_Acentuacao(string nome){
 
+    nome = Transforma_Maisculo_Minusculo(nome, false);
+
     // teste.insert(teste.begin()+posicao,237);
     const char *str = nome.c_str();
     char * pch, s;
@@ -519,14 +524,55 @@ string Retira_Acentuacao(string nome){
 string Gera_string_arquivo_input(string inputs, int grande_area){
     string retorno;
     vector<string>centro_Academico;                             // Vector com strings (constantes) dos nomes dos centros
-    centro_Academico.push_back("Ciências Biológicas");
-    centro_Academico.push_back("Ciências Humanas");
-    centro_Academico.push_back("Ciências Exatas e da Terra");
+    centro_Academico.push_back("CIÊNCIAS BIOLÓGICAS E DA SAÚDE");
+    centro_Academico.push_back("LINGUÍSTICA, LETRAS E ARTES E CIÊNCIAS HUMANAS E SOCIAIS APLICADAS");
+    centro_Academico.push_back("ENGENHARIAS E CIÊNCIAS AGRÁRIAS, EXATAS E DA TERRA");
 
-    retorno = "\\chapter{" + centro_Academico.at(grande_area) + "}\n" +
+    retorno = "\\pagestyle{empty}\n\\chapter{" + centro_Academico.at(grande_area) + "}\n" +
               "\\begin{figure}[!h]\n\t\\centering\n\t\\includegraphics[scale=1.3]{imagens/sciences.png}\n"+
-              "\\end{figure}\n\\vfill\n\\hrule\n\\pagebreak\n\n" + inputs;
+              "\\end{figure}\n\\vfill\n\\hrule\n\\pagebreak\n\\pagestyle{fancy}\n\n" + inputs;
     return retorno;
+}
+// Função para definir a string de escrita para a Escola
+string Define_Escola(string sigla){
+    string retorno;
+    if(sigla == "ECS") retorno = "Escola de Ciências da Saúde -- ECS";
+    else if(sigla == "EMCT") retorno = "Escola do Mar, Ciência e Tecnologia -- EMCT";
+    else if(sigla == "EACH") retorno = "Escola de Artes, Comunicação e Hospitalidade -- EACH";
+    else if(sigla == "ECJS") retorno = "Escola de Ciências Jurídicas e Socias -- ECJS";
+    else if(sigla == "EE")   retorno = "Escola de Educação -- EE";
+    else if(sigla == "EN")   retorno = "Escola de Negócios -- EN";
+    else if(sigla == "CAU")  retorno = "Colégio de Aplicação Univali - CAU";
+    return retorno;
+}
+// Função para set dos resumos
+void Define_Resumo(string diretorio, vector<Projeto>&vetor){
+
+    string nome, nome_padronizado, linha, resumo;
+    vector<string> separa_nomes;
+    ifstream arquivo;
+
+    for(int i=0; i<vetor.size(); i++){                  // Percorre todos os projetos
+        nome_padronizado =""; resumo = "";              // Reseta strings para próxima iteração
+        nome = vetor.at(i).getBolsista_nome_completo(); // Nome separado por espaços com maisculas e minusculas tratadas
+        separa_nomes = explode(nome, ' ');              // Vetor com os nomes separados (1 por posição)
+        while(!separa_nomes.empty()){
+            nome_padronizado += Retira_Acentuacao(Transforma_Maisculo_Minusculo(separa_nomes.front(), false)) + "_"; // Concatena nome com underline
+            separa_nomes.erase(separa_nomes.begin());           // Apaga primeiro nome
+        }// Ao fim do while nome padronizado deve ser o nome do arquivo.txt
+        nome_padronizado.pop_back();
+        nome_padronizado += ".txt";                             // Tipo do arquivo
+        //cout<<diretorio+'/'+nome_padronizado<<endl;
+        arquivo.open(diretorio+'/'+nome_padronizado);           // Abre arquivo
+
+        if(arquivo.is_open()) cout<<"Arquivo aberto para" << nome_padronizado << endl;
+
+        while(getline(arquivo, linha)){                         // Leitura de todas as linhas
+            resumo+=linha;
+        }// Após leitura de todas as linhas, resumo pode ser definido
+        vetor.at(i).setResumo(resumo);
+        arquivo.close();
+    }
 }
 
 /* Função de separação dos caracteres

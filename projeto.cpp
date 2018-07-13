@@ -142,6 +142,16 @@ void Projeto::setTitulo_Projeto(const string &value)
     titulo_Projeto = value;
 }
 
+string Projeto::getResumo() const
+{
+    return Resumo;
+}
+
+void Projeto::setResumo(const string &value)
+{
+    Resumo = value;
+}
+
 Projeto::Projeto()
 {
 
