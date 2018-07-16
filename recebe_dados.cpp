@@ -21,8 +21,8 @@ string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo);   // Poe  
 string Retira_Ponto_Final_Espaco(string nome, bool palavra_chave);      // Retira ponto final e espaço do fim da string
 string Retira_Acentuacao(string nome);                                  // Função para tratamento de strings acentuadas
 string Gera_string_arquivo_input(string inputs, int grande_area);       // Gera a string para arquivos de input
-string Define_Escola(string sigla);
-void Define_Resumo(string diretorio, vector<Projeto>&vetor);
+string Define_Escola(string sigla);                                     // Gera nome completo da escola a partir da sigla
+void Define_Resumo(string diretorio, vector<Projeto>&vetor);            // Leitura de arquivos contendo resumo
 const vector<string> explode(const string& s, const char& c);           // Função para separação de strings
 
 /*Função para leitura do arquivo CSV
@@ -41,9 +41,9 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
     int linha_controle = 0;                     // Variável para garantir que a linha de labels do CSV seja ignorada
     string csvLinha, nome_projeto;
     //vector <string> palavra_chave;
-    vector<string> nome_bolsista;
-    vector<string> nome_orientador;
-    vector<string>vetor_nome_projeto;
+    vector<string> nome_bolsista;               // Vetor que recebe nomes separados do bolsista
+    vector<string> nome_orientador;             // Vetor que recebe nomes separados do orientador
+    vector<string>vetor_nome_projeto;           // Vetor que identifica o projeto de pesquisa
     int i=0;
 
     while(getline(file, csvLinha)){
@@ -86,7 +86,7 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 
                  // Determinação dos atributos a partir de cada coluna do arquivo CSV
                 novo_projeto.setCodigo(csvColuna.at(0));
-
+                // Nome completo do bolsista
                 novo_projeto.setBolsista_nome_completo(Trata_maiusculo_minusculo(csvColuna.at(1), false));
 
                 // Vetor identificando separação entre nome e sobrenome
@@ -94,29 +94,28 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 
                 // Sobrenome em letras maisculas
                 novo_projeto.setBolsista_sobrenome(nome_bolsista.at(1));                // Define sobrenome
-
+                // Nomes restantes em letra minuscula definem o nome do bolsista
                 novo_projeto.setBolsista_nome(Trata_maiusculo_minusculo(nome_bolsista.at(0), false));
-
+                // Curso
                 novo_projeto.setCurso(Trata_maiusculo_minusculo(csvColuna.at(2), false));
-
+                // Nome completo do orientador
                 novo_projeto.setOrientador_nome_completo(Trata_maiusculo_minusculo(csvColuna.at(3), false));
-
+                // Define sobrenome do orientador
                 nome_orientador = trata_sobrenome(csvColuna.at(3));
                 novo_projeto.setOrientador_sobrenome(nome_orientador.at(1));
-
+                // Nomes restantes definem o nome do orientador
                 novo_projeto.setOrientador_nome(Trata_maiusculo_minusculo(nome_orientador.at(0), false));
-
+                // Título
                 novo_projeto.setTitulo(csvColuna.at(4));
-
+                // Área
                 novo_projeto.setArea((Trata_maiusculo_minusculo(csvColuna.at(5), false)));
-
+                // Palavra-Chave (Tratada como uma só string)
                 novo_projeto.setPalavra_chave(Trata_maiusculo_minusculo(csvColuna.at(6), true));
-
+                // Escola
                 novo_projeto.setEscola(Transforma_Maisculo_Minusculo(csvColuna.at(7), true));
-
+                // Área de apresentação (Grande área)
                 novo_projeto.setArea_apresentacao(Trata_maiusculo_minusculo(csvColuna.at(8), false));
-                vetor.push_back(novo_projeto);
-
+                vetor.push_back(novo_projeto);  // Adiciona o novo projeto criado ao vetor de projetos
         }// else
     }// while
     file.close();
@@ -128,40 +127,45 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 */
 void escreve_projetos(vector<Projeto> vetor, string arquivo){
 
-    ofstream arquivo_escrita;
-    string nome, sobrenome, area_apresentacao, escreve_input, escola;
-    stringstream concatena;
-    vector<string> identifica_nome, v_sobrenome;
+    ofstream arquivo_escrita;                                           // Arquivo a ser aberto
+    string nome, sobrenome, area_apresentacao, escreve_input, escola;   // String auxiliares
+    stringstream concatena; // Variável utilizada para concatenação de strings (podem ser utilizados meétodos diferentes para concatenação)
+    vector<string> identifica_nome, v_sobrenome;                        // Vetores auxiliares
     set<string>s_vida, s_humanas, s_exatas;           // Estruturas para ordenação dos autores por grande área
     Projeto escrita;
 
-    while (!vetor.empty()) {
+    while (!vetor.empty()) { /* A cada iteraçã lê-se uma posição do vetor gerando um arquivo .TEX para a mesma. As
+                             posições lidas são retiradas do vetor. Processo se repete até que o mesmo esteja vazio*/
 
         escrita = vetor.at(0);                  // Recebe vetor na primeira posição
 
-        while(!identifica_nome.empty()){        // Esvazia vetor
+        while(!identifica_nome.empty()){        // Esvazia vetor para a próxima iteração
             identifica_nome.pop_back();
         }
-        identifica_nome = explode(escrita.getBolsista_nome_completo(), ' ');
+        identifica_nome = explode(escrita.getBolsista_nome_completo(), ' '); // Preenche o vetor com os nomes do bolsista
 
         // Nome do arquivo .TEX é "sobrenome_primeiroNome" do bolsista
-        nome = identifica_nome.front();
-        nome = Retira_Ponto_Final_Espaco(nome, false);
-        nome = Retira_Acentuacao(nome);
-        v_sobrenome = explode(escrita.getBolsista_sobrenome(),' ');
-        if(v_sobrenome.size()==1){
+        nome = identifica_nome.front();                 // Pega primeiro nome
+        nome = Retira_Ponto_Final_Espaco(nome, false);  // Retira espaços
+        nome = Retira_Acentuacao(nome);                 // Retira acentos (será usado como nome do arquivo)
+        v_sobrenome = explode(escrita.getBolsista_sobrenome(),' ');     // Podem haver mais de um sobrenome
+        if(v_sobrenome.size()==1){                                      // Se houver um sobrenome
             sobrenome = v_sobrenome.at(0);
-        }else{
+        }else{                                                          // Se houver 2 sobrenomes
             sobrenome = v_sobrenome.at(0) + "_" + v_sobrenome.at(1);
         }
+        // Tratamento sobrenome
         sobrenome = Retira_Ponto_Final_Espaco(sobrenome, false);
         sobrenome = Retira_Acentuacao(sobrenome);
+        // Tratamento da área de apresentação (define o diretório de inclusão dos arquivos)
         area_apresentacao = Retira_Ponto_Final_Espaco(escrita.getArea_apresentacao(), false);
         area_apresentacao = Transforma_Maisculo_Minusculo(area_apresentacao, false);
 
-        //cout<<Retira_Ponto_Final_Espaco(escrita.getBolsista_nome(), false)<<"-"<<endl;
         escola = Retira_Ponto_Final_Espaco(escrita.getEscola(), false);
-        concatena.str("");
+
+        concatena.str("");  // Zera a string que define o nome do arquivo para a próxima iteração
+
+        // Define diretório de escrita do arquivo .TEX
         concatena << arquivo<<"/"<<area_apresentacao<<"/"<<Transforma_Maisculo_Minusculo(sobrenome, false)
                      << "_" << Transforma_Maisculo_Minusculo(nome, false) <<".tex";
         arquivo_escrita.open(concatena.str());
@@ -200,6 +204,8 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
 
         escreve_input = concatena.str();    // Pega o nome completo do arquivo de escrita do projeto
         escreve_input.replace(escreve_input.begin(), escreve_input.begin()+arquivo.length()+1, ""); // Exclui o caminho inicial
+        // A variável escreve_input recebe apenas a parte contendo o "sobrenome_primeiroNome" do diretório
+
         // Aqui os alunos são separados por área e ordenados pela estrutura set
         if(area_apresentacao == "vida"){s_vida.insert(escreve_input);}
         else if(area_apresentacao == "humanas"){s_humanas.insert(escreve_input);}
@@ -231,7 +237,7 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
     dir_hum  = arquivo + "/grande_area_humanas.tex";
     dir_exa  = arquivo + "/grande_area_exatas.tex";
 
-    // Com as strings de input concatenas deve-se gerar os arquivos que receberão estes dados
+    // Com as strings de input concatenadas deve-se gerar os arquivos que receberão estes dados
     vida.open(dir_vida);
     vida << Gera_string_arquivo_input(input_vida, 0);
     vida.close();
@@ -256,12 +262,13 @@ vector<string> trata_sobrenome(string sobrenome){
     //unordered_set <string> preposicao;
     nomes = explode(sobrenome, ' ');        //Divide o nome completo em espaçoes
 
-    // Casos especiais para nomes
+    /*Casos especiais para nomes -> Se o último for uma das opções abaixo, deve-se pegar também o penúltimo nome
+                                    para definição do sobrenome para citação*/
     casos_especias.insert("FILHO");
     casos_especias.insert("NETO");
     casos_especias.insert("JÚNIOR");
     casos_especias.insert("JUNIOR");
-    // Preposições
+    // Preposições -> Não devem ser consideradas para definição do sobrenome no momento da citação do autor
     /*preposicao.insert("DE");
     preposicao.insert("DA");
     preposicao.insert("DO");
@@ -270,10 +277,10 @@ vector<string> trata_sobrenome(string sobrenome){
     */
 
     int ultima_posicao = nomes.size()-1;
-    string ultimo_nome = nomes.at(ultima_posicao);              // Pega a última posição
+    string ultimo_nome = nomes.at(ultima_posicao);              // Pega a última posição (sempre será usada)
     nomes.erase(nomes.end());                                   // Apaga a última posição
 
-    string penultimo_nome = nomes.at(ultima_posicao-1);
+    string penultimo_nome = nomes.at(ultima_posicao-1);         // Penúltimo nome pode não ser utilizado
 
     ultimo_nome = Transforma_Maisculo_Minusculo(ultimo_nome, true);
     penultimo_nome = Transforma_Maisculo_Minusculo(penultimo_nome, true);
@@ -301,8 +308,12 @@ vector<string> trata_sobrenome(string sobrenome){
     }
     return retorno;
 }
-/* Função para transformação de string para Caixa alta
-    Não converte caracteres acentuados. Para isso deve-se utilizar a função Retira_Acentuacao
+/* Função para transformação de string para Caixa alta ou baixa
+   Parâmetros -> palavra a ser transformada, definição de transformação para maiusculo(true) ou minusculo(false)
+   Utilizam-se as funções toupper e tolower para transformção de cada caracter individualmente para minusculo ou
+   maiusculo. No entanto esta função não transforma caracteres especiais (acentuados ou "ç"). Para isso deve-se fazer
+   esta transformação manualmente. Os valores utilizados para determinar os caracteres em maiusculo ou minusculo são
+   referentes ao códigos UTF8.
 */
 string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo){
     string retorno;
@@ -314,6 +325,8 @@ string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo){
     while(contador < 11){
         switch(contador){
             case 0:
+            /* Função strstr procura por uma determinada string em uma variável const char. Caso encotre, pch indica
+             * a posição em que a mesma foi encontrada */
                 if(Maiusculo){pch = strstr (str,"á"); insere="\u00C1";}     // Código UTF8 - "Á"
                 else{pch = strstr (str,"Á");insere = "\u00E1";}             // Código UTF8 - "á"
                 break;
@@ -358,11 +371,11 @@ string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo){
                 else{pch = strstr (str,"Õ"); insere = "\u00F5";}            // "õ"
                 break;
         }
-        contador++;
+        contador++;     // Garante que todos os casos serão buscados na palavra
 
-        if(pch != NULL){
+        if(pch != NULL){  // Indica que o caso sendo verificado atualmente foi encontrado na palavra
             posicao = pch-str;                          // Posição em que caractere especial foi encontrado
-            palavra.erase(palavra.begin()+posicao);     // Deve-se retirar 2 caracteres naquela posição
+            palavra.erase(palavra.begin()+posicao);     // Deve-se retirar 2 caracteres naquela posição (caracter acentuado = 2 caracteres)
             palavra.erase(palavra.begin()+posicao);
             palavra.insert(posicao, insere);            // Insere na posição correta o caractere especial transformado
     }
@@ -376,7 +389,6 @@ string Transforma_Maisculo_Minusculo(string palavra, bool Maiusculo){
     }
     return retorno;
 }
-
 // Função para concatenação de vetor de strings
 string nome_concatenado(vector<string> nomes){
     //stringstream concatena;
@@ -388,8 +400,8 @@ string nome_concatenado(vector<string> nomes){
     return concatena;
 }
 /* Função para que string receba somente a primeira letra maiuscula
-    palavra_chave = True  -> Tratamento especial para palvras-chave por conta da possível presença de siglas
-    palavra_chave = False -> Poe todas as letras da string em minusculo, depois poe em maisculo apenas a primeira letra
+    palavra_chave = True  -> Tratamento especial para palvras-chave, por conta da possível presença de siglas
+    palavra_chave = False -> Põe todas as letras da string em minusculo, depois põe em maiusculo apenas a primeira letra
 */
 string Trata_maiusculo_minusculo(string nome, bool palavra_chave){
 
