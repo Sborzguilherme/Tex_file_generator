@@ -23,6 +23,7 @@ string Retira_Acentuacao(string nome);                                  // Funç
 string Gera_string_arquivo_input(string inputs, int grande_area);       // Gera a string para arquivos de input
 string Define_Escola(string sigla);                                     // Gera nome completo da escola a partir da sigla
 void Define_Resumo(string diretorio, vector<Projeto>&vetor);            // Leitura de arquivos contendo resumo
+string Sobrenome_Arquivo(string nome_completo, string sobrenome);       // Retorna nome e sobrenome na formatação para escrita do arquivo
 const vector<string> explode(const string& s, const char& c);           // Função para separação de strings
 
 /*Função para leitura do arquivo CSV
@@ -128,7 +129,7 @@ void le_projetos(string arquivo, vector<Projeto> &vetor){       // Vetor é pass
 void escreve_projetos(vector<Projeto> vetor, string arquivo){
 
     ofstream arquivo_escrita;                                           // Arquivo a ser aberto
-    string nome, sobrenome, area_apresentacao, escreve_input, escola;   // String auxiliares
+    string nome_arquivo, area_apresentacao, escreve_input, escola;   // String auxiliares
     stringstream concatena; // Variável utilizada para concatenação de strings (podem ser utilizados meétodos diferentes para concatenação)
     vector<string> identifica_nome, v_sobrenome;                        // Vetores auxiliares
     set<string>s_vida, s_humanas, s_exatas;           // Estruturas para ordenação dos autores por grande área
@@ -142,7 +143,7 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
         while(!identifica_nome.empty()){        // Esvazia vetor para a próxima iteração
             identifica_nome.pop_back();
         }
-        identifica_nome = explode(escrita.getBolsista_nome_completo(), ' '); // Preenche o vetor com os nomes do bolsista
+        /*identifica_nome = explode(escrita.getBolsista_nome_completo(), ' '); // Preenche o vetor com os nomes do bolsista
 
         // Nome do arquivo .TEX é "sobrenome_primeiroNome" do bolsista
         nome = identifica_nome.front();                 // Pega primeiro nome
@@ -156,7 +157,7 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
         }
         // Tratamento sobrenome
         sobrenome = Retira_Ponto_Final_Espaco(sobrenome, false);
-        sobrenome = Retira_Acentuacao(sobrenome);
+        sobrenome = Retira_Acentuacao(sobrenome);*/
         // Tratamento da área de apresentação (define o diretório de inclusão dos arquivos)
         area_apresentacao = Retira_Ponto_Final_Espaco(escrita.getArea_apresentacao(), false);
         area_apresentacao = Transforma_Maisculo_Minusculo(area_apresentacao, false);
@@ -164,10 +165,9 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
         escola = Retira_Ponto_Final_Espaco(escrita.getEscola(), false);
 
         concatena.str("");  // Zera a string que define o nome do arquivo para a próxima iteração
-
+        nome_arquivo = Sobrenome_Arquivo(escrita.getBolsista_nome_completo(), escrita.getBolsista_sobrenome());
         // Define diretório de escrita do arquivo .TEX
-        concatena << arquivo<<"/"<<area_apresentacao<<"/"<<Transforma_Maisculo_Minusculo(sobrenome, false)
-                     << "_" << Transforma_Maisculo_Minusculo(nome, false) <<".tex";
+        concatena << arquivo<<"/"<<area_apresentacao<<"/"<<nome_arquivo <<".tex";
         arquivo_escrita.open(concatena.str());
 
         // Definição do formato do arquivo .TEX
@@ -186,8 +186,8 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
                         << "% Área\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getArea(), false)<< "}\n"
                         << "% Resumo\n"
-                        //<< "{" << escrita.getResumo()<<"}\n"
-                        <<"{\\blindtext[5][1]}\n"
+                        << "{" << escrita.getResumo()<<"}\n"
+                        //<<"{\\blindtext[5][1]}\n"
                         << "% Palavras-chave\n"
                         << "{" << Retira_Ponto_Final_Espaco(escrita.getPalavra_chave(), true)
                         << "}\n"
@@ -207,12 +207,16 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
         // A variável escreve_input recebe apenas a parte contendo o "sobrenome_primeiroNome" do diretório
 
         // Aqui os alunos são separados por área e ordenados pela estrutura set
-        if(area_apresentacao == "vida"){s_vida.insert(escreve_input);}
-        else if(area_apresentacao == "humanas"){s_humanas.insert(escreve_input);}
-        else{s_exatas.insert(escreve_input);}
+        if(area_apresentacao == "vida"){s_vida.insert(nome_arquivo);}
+        else if(area_apresentacao == "humanas"){s_humanas.insert(nome_arquivo);}
+        else{s_exatas.insert(nome_arquivo);}
 
-        //cout<<escreve_input<<endl;
     }// End While
+
+    // Cria txt com todos os nomes de arquivos que serão criados
+    ofstream lista_arquivos;
+    lista_arquivos.open("lista_arquivos.txt");
+
     // Geração dos Arquivos de Input
     ofstream vida, humanas, exatas;                             // Controle individual de cada arquivo
     string input_vida ="", input_humanas="", input_exatas="";   // Strings para escrita das linhas de input
@@ -220,16 +224,21 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
     // Após todas os nomes terem sido inseridos deve-se gerar a string para escrita no arquivo
     set<string>::iterator it_v = s_vida.begin();      // iterador para percorrer a estrutura set
     for(it_v; it_v != s_vida.end(); it_v++){
-        input_vida+= "\\input{" + *it_v + "} \\clearpage\n";
+        input_vida+= "\\input{vida/" + *it_v + "}\t\t\t\t\\clearpage\n";
+        lista_arquivos<<*it_v<<"\n";
     }
     set<string>::iterator it_h = s_humanas.begin();
     for(it_h; it_h != s_humanas.end(); it_h++){
-        input_humanas+= "\\input{" + *it_h + "} \\clearpage\n";
+        input_humanas+= "\\input{humanas/" + *it_h + "}\t\t\t\t\\clearpage\n";
+        lista_arquivos<<*it_h<<"\n";
     }
     set<string>::iterator it_e = s_exatas.begin();
     for(it_e; it_e != s_exatas.end(); it_e++){
-        input_exatas+= "\\input{" + *it_e + "} \\clearpage\n";
+        input_exatas+= "\\input{exatas/" + *it_e + "}\t\t\t\t\\clearpage\n";
+        lista_arquivos<<*it_e<<"\n";
     }
+
+    //lista_arquivos.close();
 
     string dir_vida, dir_hum, dir_exa;
 
@@ -560,24 +569,18 @@ string Define_Escola(string sigla){
 // Função para set dos resumos
 void Define_Resumo(string diretorio, vector<Projeto>&vetor){
 
-    string nome, nome_padronizado, linha, resumo;
-    vector<string> separa_nomes;
+    string nome_padronizado, linha, resumo;
     ifstream arquivo;
 
     for(int i=0; i<vetor.size(); i++){                  // Percorre todos os projetos
         nome_padronizado =""; resumo = "";              // Reseta strings para próxima iteração
-        nome = vetor.at(i).getBolsista_nome_completo(); // Nome separado por espaços com maisculas e minusculas tratadas
-        separa_nomes = explode(nome, ' ');              // Vetor com os nomes separados (1 por posição)
-        while(!separa_nomes.empty()){
-            nome_padronizado += Retira_Acentuacao(Transforma_Maisculo_Minusculo(separa_nomes.front(), false)) + "_"; // Concatena nome com underline
-            separa_nomes.erase(separa_nomes.begin());           // Apaga primeiro nome
-        }// Ao fim do while nome padronizado deve ser o nome do arquivo.txt
-        nome_padronizado.pop_back();
-        nome_padronizado += ".txt";                             // Tipo do arquivo
-        //cout<<diretorio+'/'+nome_padronizado<<endl;
+
+        nome_padronizado = Sobrenome_Arquivo(vetor.at(i).getBolsista_nome_completo(), vetor.at(i).getBolsista_sobrenome());
+        nome_padronizado += ".tex";                             // Tipo do arquivo
+
         arquivo.open(diretorio+'/'+nome_padronizado);           // Abre arquivo
 
-        if(arquivo.is_open()) cout<<"Arquivo aberto para" << nome_padronizado << endl;
+        //if(arquivo.is_open()) cout<<nome_padronizado<<endl;
 
         while(getline(arquivo, linha)){                         // Leitura de todas as linhas
             resumo+=linha;
@@ -585,6 +588,32 @@ void Define_Resumo(string diretorio, vector<Projeto>&vetor){
         vetor.at(i).setResumo(resumo);
         arquivo.close();
     }
+}
+/* Função que gera o nome dos arquivos de saída no formato "sobrenome_nome.tex"
+    Parâmetros: Nome completo e sobrenome do bolsista (atribustos da classe)
+*/
+string Sobrenome_Arquivo(string nome_completo, string sobrenome_c){
+    vector<string> identifica_nome, v_sobrenome;
+    string nome, sobrenome;
+    identifica_nome = explode(nome_completo, ' ');              // Nomes separados
+    v_sobrenome = explode(sobrenome_c, ' ');                      // Sobrenomes separados
+
+    nome = identifica_nome.front();                             // Primeiro Nome
+    nome = Retira_Ponto_Final_Espaco(nome, false);              // Retira espaços
+    nome = Retira_Acentuacao(nome);                             // Retira acentos (será usado como nome do arquivo)
+    nome = Transforma_Maisculo_Minusculo(nome, false);          // Passa para minúsculo
+
+    if(v_sobrenome.size()==1){                                  // Se houver um sobrenome
+        sobrenome = v_sobrenome.at(0);
+    }else{                                                      // Se houver 2 sobrenomes
+        sobrenome = v_sobrenome.at(0) + "_" + v_sobrenome.at(1);
+    }
+
+    sobrenome = Retira_Ponto_Final_Espaco(sobrenome, false);
+    sobrenome = Retira_Acentuacao(sobrenome);
+    sobrenome = Transforma_Maisculo_Minusculo(sobrenome,false);
+
+    return (sobrenome + "_" + nome);
 }
 
 /* Função de separação dos caracteres
