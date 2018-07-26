@@ -25,6 +25,7 @@ string Define_Escola(string sigla);                                     // Gera 
 void Define_Resumo(string diretorio, vector<Projeto>&vetor);            // Leitura de arquivos contendo resumo
 string Sobrenome_Arquivo(string nome_completo, string sobrenome);       // Retorna nome e sobrenome na formatação para escrita do arquivo
 const vector<string> explode(const string& s, const char& c);           // Função para separação de strings
+void Cria_lista_arquivos(vector<Projeto>vetor);                         // Cria txt com nomes do arquivos.TEX
 
 /*Função para leitura do arquivo CSV
     O vetor passado por referência é atualizado com os dados lidos do arquivo
@@ -213,9 +214,6 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
 
     }// End While
 
-    // Cria txt com todos os nomes de arquivos que serão criados
-    ofstream lista_arquivos;
-    lista_arquivos.open("lista_arquivos.txt");
 
     // Geração dos Arquivos de Input
     ofstream vida, humanas, exatas;                             // Controle individual de cada arquivo
@@ -225,20 +223,15 @@ void escreve_projetos(vector<Projeto> vetor, string arquivo){
     set<string>::iterator it_v = s_vida.begin();      // iterador para percorrer a estrutura set
     for(it_v; it_v != s_vida.end(); it_v++){
         input_vida+= "\\input{vida/" + *it_v + "}\t\t\t\t\\clearpage\n";
-        lista_arquivos<<*it_v<<"\n";
     }
     set<string>::iterator it_h = s_humanas.begin();
     for(it_h; it_h != s_humanas.end(); it_h++){
         input_humanas+= "\\input{humanas/" + *it_h + "}\t\t\t\t\\clearpage\n";
-        lista_arquivos<<*it_h<<"\n";
     }
     set<string>::iterator it_e = s_exatas.begin();
     for(it_e; it_e != s_exatas.end(); it_e++){
         input_exatas+= "\\input{exatas/" + *it_e + "}\t\t\t\t\\clearpage\n";
-        lista_arquivos<<*it_e<<"\n";
     }
-
-    //lista_arquivos.close();
 
     string dir_vida, dir_hum, dir_exa;
 
@@ -614,6 +607,23 @@ string Sobrenome_Arquivo(string nome_completo, string sobrenome_c){
     sobrenome = Transforma_Maisculo_Minusculo(sobrenome,false);
 
     return (sobrenome + "_" + nome);
+}
+
+void Cria_lista_arquivos(vector<Projeto>vetor){
+    // Cria txt com todos os nomes de arquivos que serão criados
+    ofstream lista_arquivos;
+    lista_arquivos.open("lista_arquivos.txt");
+    Projeto projeto_atual;
+    string escreve_arquivo;
+
+    while(!vetor.empty()){
+        projeto_atual = vetor.front();               // Pega primeira posição
+        escreve_arquivo = Sobrenome_Arquivo(projeto_atual.getBolsista_nome_completo(), projeto_atual.getBolsista_sobrenome());
+        lista_arquivos << escreve_arquivo + "\n";    // Escreve string no arquivo
+        vetor.erase(vetor.begin());                  // Apaga primeira posição do vetor
+    }
+
+    lista_arquivos.close();
 }
 
 /* Função de separação dos caracteres

@@ -33,6 +33,7 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     ui->label_end->setVisible(false);
 
     le_projetos(ui->file_line->text().toStdString(), vetor_projetos);   // Preenche vetor de projetos a partir do arquivo CSV
+    Cria_lista_arquivos(vetor_projetos);                                // Nomes dos arquivos que serão abertos pelo script em python
 
     /* Script de leitura dos resumos, desenvolvido em python, é chamado a partir do terminal
         Comando para execução do arquivo é uma string de 3 partes
@@ -45,14 +46,15 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
 
         Parte 3 -> Parâmetro que indica de onde os resumos serão lidos
     */
-    //string command = "python C:\\Users\\Guilherme\\PycharmProjects\\DOC_READ\\doc_r.py C:/Users/Guilherme/Documents/Univali/CSV_ARQUIVOS/Resumos/";
-    string local_resumo = ui->file_line_3->text().toStdString().c_str();
-    string command = "debug/venv/Scripts/python.exe debug/doc_r.py";
-    command+=(" " + local_resumo);
+
+    //string command = "python C:\\Users\\Guilherme\\PycharmProjects\\DOC_READ\\doc_r.py C:\\Users\\Guilherme\\Documents\\Univali\\CSV_ARQUIVOS\\Resumos";
+    string local_resumo = ui->file_line_3->text().toStdString().c_str();    // Diretório informado pelo usuário
+    string command = "venv\\Scripts\\python doc_r.py";
+    command+=(" " + local_resumo);                                          // Adiciona Parte 3 do comando
     //system(command.c_str());
     WinExec(command.c_str(), SW_HIDE);  // Invoca o "cmd" sem que ele apareça
 
-    Define_Resumo(local_resumo+"/tex", vetor_projetos);
+    Define_Resumo(local_resumo+"\\tex", vetor_projetos);
 
     this->setVetor_projetos(vetor_projetos);
 
