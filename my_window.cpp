@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <iostream>
+#include <unistd.h>
 #include "recebe_dados.cpp"
 
 using namespace std;
@@ -25,15 +26,28 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     static vector<Projeto>vetor_projetos;
 
     // Só permite a leitura de arquivos .csv
-    QString arquivo_leitura = QFileDialog::getOpenFileName(this, tr("Arquivo de Leitura"), ui->file_line->text(), tr("CSV (*.csv)"));
-    // O caminho lido é salvo na variável arquivo_leitura
-    if(!arquivo_leitura.isEmpty()){
-        ui->file_line->setText(arquivo_leitura); // Coloca o caminho do arquivo de leitura no edit line
-    }
-    ui->label_end->setVisible(false);
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Arquivo de Leitura"), ui->file_line_3->text(), tr("CSV (*.csv)"));
 
-    le_projetos(ui->file_line->text().toStdString(), vetor_projetos);   // Preenche vetor de projetos a partir do arquivo CSV
-    Cria_lista_arquivos(vetor_projetos);                                // Nomes dos arquivos que serão abertos pelo script em python
+    if(!files.isEmpty()){
+        if(files.size()>1){
+            ui->file_line->setText("Vários Arquivos Selecionados");
+        }else{
+            ui->file_line->setText(files.at(0));
+        }
+    }
+    QString current_file;
+    string s_current_file;
+
+    for(int i=0; i<files.size();i++){
+        current_file = files.at(i);
+        s_current_file = current_file.toStdString();
+        Le_projetos(s_current_file, vetor_projetos);    // Preenche vetor de projetos a partir dos arquivos CSV
+    }
+    Cria_lista_arquivos(vetor_projetos);                // Nomes dos arquivos que serão abertos pelo script em python
+
+    string arquivo_teste_csv_form;
+    arquivo_teste_csv_form = ui->file_line_3->text().toStdString() + "/teste.csv";
+    Le_CSV_resumo(arquivo_teste_csv_form, vetor_projetos);
 
     /* Script de leitura dos resumos, desenvolvido em python, é chamado a partir do terminal
         Comando para execução do arquivo é uma string de 3 partes
@@ -51,10 +65,14 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     string local_resumo = ui->file_line_3->text().toStdString().c_str();    // Diretório informado pelo usuário
     string command = "venv\\Scripts\\python doc_r.py";
     command+=(" " + local_resumo);                                          // Adiciona Parte 3 do comando
-    //system(command.c_str());
-    WinExec(command.c_str(), SW_HIDE);  // Invoca o "cmd" sem que ele apareça
+    system(command.c_str());
 
-    Define_Resumo(local_resumo+"\\tex", vetor_projetos);
+    /* Uso do WinExec
+     * Caso todos os arquivos de leitura sejam selecionados de uma vez só, é necessário pressionar o botão browse
+       de leitura novamente. Caso contrário, os resumos não são definidos */
+    //WinExec(command.c_str(), SW_HIDE);  // Invoca o "cmd" sem que ele apareça
+
+    Define_resumo(local_resumo+"\\tex", vetor_projetos);
 
     this->setVetor_projetos(vetor_projetos);
 
@@ -83,7 +101,6 @@ void MyWindow::setVetor_projetos(const vector<Projeto> &value)
 void MyWindow::on_file_generate_button_clicked()
 {
     // Pega os caminhos selecionados acima
-    string arquivo_leitura = ui->file_line->text().toStdString();
     string diretorio_escrita = ui->file_line_2->text().toStdString();
 
     string cria_dir_vida, cria_dir_hum, cria_dir_exa;
@@ -100,7 +117,7 @@ void MyWindow::on_file_generate_button_clicked()
 
     // Criação dos diretórios para armazenar os arquivos gerados
     mkdir(dir_vida); mkdir(dir_humanas); mkdir(dir_exatas);
-    escreve_projetos(this->getVetor_projetos(), diretorio_escrita);                // Escreve os dados do vetor em arquivos .TEX
+    Escreve_projetos(this->getVetor_projetos(), diretorio_escrita);                // Escreve os dados do vetor em arquivos .TEX
     ui->label_end->setVisible(true);
 }
 
@@ -112,7 +129,5 @@ void MyWindow::on_browse_button_3_clicked()   // Boão browse para diretório do
         ui->file_line_3->setText(diretorio_escrita);
     }
 
-    mkdir((ui->file_line_3->text().toStdString()+"/tex").c_str());  // Cria pasta para inserção dos resumos em .TEX
-
-
+    mkdir((ui->file_line_3->text().toStdString()+"\\tex").c_str());  // Cria pasta para inserção dos resumos em .TEX
 }

@@ -25,6 +25,10 @@ private:                    // Atributos da classe
     string area;
     string titulo;
 
+    // Atributos vindos do CSV do formulário
+    vector<string> autores_adicionais;
+    string modo_apresentacao;
+
     string palavra_chave;
     string area_apresentacao;
 
@@ -62,6 +66,10 @@ public:
     void setTitulo_Projeto(const string &value);
     string getResumo() const;
     void setResumo(const string &value);
+    string getModo_apresentacao() const;
+    void setModo_apresentacao(const string &value);
+    vector<string> getAutores_adicionais() const;
+    void setAutores_adicionais(const vector<string> &value);
 };
 
 #endif // PROJETO_H

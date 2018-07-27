@@ -152,6 +152,26 @@ void Projeto::setResumo(const string &value)
     Resumo = value;
 }
 
+string Projeto::getModo_apresentacao() const
+{
+    return modo_apresentacao;
+}
+
+void Projeto::setModo_apresentacao(const string &value)
+{
+    modo_apresentacao = value;
+}
+
+vector<string> Projeto::getAutores_adicionais() const
+{
+    return autores_adicionais;
+}
+
+void Projeto::setAutores_adicionais(const vector<string> &value)
+{
+    autores_adicionais = value;
+}
+
 Projeto::Projeto()
 {
 
