@@ -24,6 +24,7 @@ MyWindow::~MyWindow()
 void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
 {
     static vector<Projeto>vetor_projetos;
+    //vector<string> vetor_nome_arquivos;
 
     // Só permite a leitura de arquivos .csv
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Arquivo de Leitura"), ui->file_line_3->text(), tr("CSV (*.csv)"));
@@ -43,6 +44,11 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
         s_current_file = current_file.toStdString();
         Le_projetos(s_current_file, vetor_projetos);    // Preenche vetor de projetos a partir dos arquivos CSV
     }
+    //this->setVetor_nome_arquivos(vetor_nome_arquivos);
+    /*for(int i=0;i<vetor_nome_arquivos.size();i++){
+        cout<<vetor_nome_arquivos.at(i)<<endl;
+    }*/
+
     Cria_lista_arquivos(vetor_projetos);                // Nomes dos arquivos que serão abertos pelo script em python
 
     string arquivo_teste_csv_form;
@@ -61,7 +67,6 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
         Parte 3 -> Parâmetro que indica de onde os resumos serão lidos
     */
 
-    //string command = "python C:\\Users\\Guilherme\\PycharmProjects\\DOC_READ\\doc_r.py C:\\Users\\Guilherme\\Documents\\Univali\\CSV_ARQUIVOS\\Resumos";
     string local_resumo = ui->file_line_3->text().toStdString().c_str();    // Diretório informado pelo usuário
     string command = "venv\\Scripts\\python doc_r.py";
     command+=(" " + local_resumo);                                          // Adiciona Parte 3 do comando
@@ -73,6 +78,16 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     //WinExec(command.c_str(), SW_HIDE);  // Invoca o "cmd" sem que ele apareça
 
     Define_resumo(local_resumo+"\\tex", vetor_projetos);
+
+    /*ofstream test_file;
+    string test_string="";
+    for(int i=0; i<vetor_projetos.size();i++){
+        test_string+=Sobrenome_arquivo(vetor_projetos.at(i).getBolsista_nome(), vetor_projetos.at(i).getBolsista_sobrenome()) + "\n";
+    }
+    test_file.open("Test_file.txt");
+    test_file << test_string;
+    test_file.close();
+    */
 
     this->setVetor_projetos(vetor_projetos);
 
@@ -139,4 +154,14 @@ void MyWindow::on_browse_button_4_clicked() // Botão Browse para selecionar arq
     if(!csv_file.isEmpty()){
         ui->file_line_4->setText(csv_file);
     }
+}
+
+vector<string> MyWindow::getVetor_nome_arquivos() const
+{
+    return vetor_nome_arquivos;
+}
+
+void MyWindow::setVetor_nome_arquivos(const vector<string> &value)
+{
+    vetor_nome_arquivos = value;
 }

@@ -20,6 +20,9 @@ public:
     vector<Projeto> getVetor_projetos() const;
     void setVetor_projetos(const vector<Projeto> &value);
 
+    vector<string> getVetor_nome_arquivos() const;
+    void setVetor_nome_arquivos(const vector<string> &value);
+
 private slots:
     void on_pushButton_clicked();
 
@@ -36,6 +39,7 @@ private slots:
 private:
     Ui::MyWindow *ui;
     vector<Projeto> vetor_projetos;
+    vector<string> vetor_nome_arquivos;
 };
 
 #endif // MY_WINDOW_H
