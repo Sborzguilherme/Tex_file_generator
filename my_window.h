@@ -31,6 +31,8 @@ private slots:
 
     void on_browse_button_3_clicked();
 
+    void on_browse_button_4_clicked();
+
 private:
     Ui::MyWindow *ui;
     vector<Projeto> vetor_projetos;

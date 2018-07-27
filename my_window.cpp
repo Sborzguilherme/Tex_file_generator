@@ -46,7 +46,7 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     Cria_lista_arquivos(vetor_projetos);                // Nomes dos arquivos que serão abertos pelo script em python
 
     string arquivo_teste_csv_form;
-    arquivo_teste_csv_form = ui->file_line_3->text().toStdString() + "/teste.csv";
+    arquivo_teste_csv_form = ui->file_line_4->text().toStdString();
     Le_CSV_resumo(arquivo_teste_csv_form, vetor_projetos);
 
     /* Script de leitura dos resumos, desenvolvido em python, é chamado a partir do terminal
@@ -130,4 +130,13 @@ void MyWindow::on_browse_button_3_clicked()   // Boão browse para diretório do
     }
 
     mkdir((ui->file_line_3->text().toStdString()+"\\tex").c_str());  // Cria pasta para inserção dos resumos em .TEX
+}
+
+void MyWindow::on_browse_button_4_clicked() // Botão Browse para selecionar arquivo CSV do Formulário
+{
+    QString csv_file = QFileDialog ::getOpenFileName(this, tr("CSV Formulário"), ui->file_line_3->text(), tr("CSV (*.csv)"));
+
+    if(!csv_file.isEmpty()){
+        ui->file_line_4->setText(csv_file);
+    }
 }
