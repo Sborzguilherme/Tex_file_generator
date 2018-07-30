@@ -68,7 +68,12 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     */
 
     string local_resumo = ui->file_line_3->text().toStdString().c_str();    // Diretório informado pelo usuário
-    string command = "venv\\Scripts\\python doc_r.py";
+
+    // Formulário do Google
+    //string command = "venv\\Scripts\\python doc_r.py";
+
+    // ELIS
+    string command = "venv\\Scripts\\python doc_r_ELIS.py";
     command+=(" " + local_resumo);                                          // Adiciona Parte 3 do comando
     system(command.c_str());
 

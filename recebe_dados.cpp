@@ -168,8 +168,8 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         nome_arquivo = Sobrenome_arquivo(escrita.getBolsista_nome(), escrita.getBolsista_sobrenome());
 
         if(!nomes_utilizados.empty()){
-            set<string>::iterator it = nomes_utilizados.begin();
-            for(it; it!=nomes_utilizados.end();it++){
+            set<string>::iterator it;
+            for(it = nomes_utilizados.begin(); it!=nomes_utilizados.end();it++){
                 if(*it == nome_arquivo){
                     nome_arquivo+="_2";
                     break;
@@ -236,16 +236,16 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
     string input_vida ="", input_humanas="", input_exatas="";   // Strings para escrita das linhas de input
 
     // Após todas os nomes terem sido inseridos deve-se gerar a string para escrita no arquivo
-    set<string>::iterator it_v = s_vida.begin();      // iterador para percorrer a estrutura set
-    for(it_v; it_v != s_vida.end(); it_v++){
+    set<string>::iterator it_v;      // iterador para percorrer a estrutura set
+    for(it_v = s_vida.begin(); it_v != s_vida.end(); it_v++){
         input_vida+= "\\input{vida/" + *it_v + "}\\clearpage\n";
     }
-    set<string>::iterator it_h = s_humanas.begin();
-    for(it_h; it_h != s_humanas.end(); it_h++){
+    set<string>::iterator it_h;
+    for(it_h = s_humanas.begin(); it_h != s_humanas.end(); it_h++){
         input_humanas+= "\\input{humanas/" + *it_h + "}\\clearpage\n";
     }
-    set<string>::iterator it_e = s_exatas.begin();
-    for(it_e; it_e != s_exatas.end(); it_e++){
+    set<string>::iterator it_e;
+    for(it_e = s_exatas.begin(); it_e != s_exatas.end(); it_e++){
         input_exatas+= "\\input{exatas/" + *it_e + "}\\clearpage\n";
     }
 
@@ -589,8 +589,15 @@ void Define_resumo(string diretorio, vector<Projeto>&vetor){
 
     for(int i=0; i<vetor.size(); i++){                  // Percorre todos os projetos
         nome_padronizado =""; resumo = "";              // Reseta strings para próxima iteração
-        nome_padronizado = Sobrenome_arquivo(vetor.at(i).getBolsista_nome(), vetor.at(i).getBolsista_sobrenome());
 
+        // Formulário do Google
+        //nome_padronizado = Sobrenome_arquivo(vetor.at(i).getBolsista_nome(), vetor.at(i).getBolsista_sobrenome());
+
+        //ELIS
+        nome_padronizado = vetor.at(i).getBolsista_nome_completo();
+        nome_padronizado = Transforma_maisculo_minusculo(nome_padronizado,false);
+        nome_padronizado = Retira_acentuacao(nome_padronizado);
+        nome_padronizado = Retira_ponto_final_espaco(nome_padronizado,false);
 
         if(!nomes_utilizados.empty()){
             set<string>::iterator it = nomes_utilizados.begin();
@@ -603,19 +610,7 @@ void Define_resumo(string diretorio, vector<Projeto>&vetor){
         }
         nomes_utilizados.insert(nome_padronizado);  // Adiciona nome ao set
 
-        /*// Percorre toda a lista para encontrar o nome do arquivo
-        for(int i=0; i<vetor_nome_arquivos.size();i++){
-            if(nome_padronizado == vetor_nome_arquivos.at(i)){
-                vetor_nome_arquivos.erase(vetor_nome_arquivos.begin()+i);
-            }else if((nome_padronizado+"_2") == vetor_nome_arquivos.at(i)){
-                vetor_nome_arquivos.erase(vetor_nome_arquivos.begin()+i);
-                nome_padronizado+="_2";
-            }
-        }*/
-
-
         nome_padronizado += ".tex";                             // Tipo do arquivo
-
         arquivo.open(diretorio+'/'+nome_padronizado);           // Abre arquivo
 
         //if(arquivo.is_open()) cout<<nome_padronizado<<endl;
@@ -630,8 +625,8 @@ void Define_resumo(string diretorio, vector<Projeto>&vetor){
             sem_resumo.insert(nome_padronizado);
         }
     }
-    set<string>::iterator it_sr = sem_resumo.begin();      // iterador para percorrer a estrutura set
-    for(it_sr; it_sr != sem_resumo.end(); it_sr++){
+    set<string>::iterator it_sr;      // iterador para percorrer a estrutura set
+    for(it_sr = sem_resumo.begin(); it_sr != sem_resumo.end(); it_sr++){
         input_sem_resumo+= *it_sr + "\n";
     }
     arq_sem_resumo.open("sem_resumo.txt");
@@ -715,8 +710,8 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
 
 
         if(!nomes_utilizados.empty()){
-            set<string>::iterator it = nomes_utilizados.begin();
-            for(it; it!=nomes_utilizados.end();it++){
+            set<string>::iterator it;
+            for(it= nomes_utilizados.begin(); it!=nomes_utilizados.end();it++){
                 if(*it == nome_padronizado){
                     nome_padronizado+="_2";
                     break;
@@ -742,8 +737,8 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
         vetor.erase(vetor.begin());                  // Apaga primeira posição do vetor
     }
 
-    set<string>::iterator it_n = nomes_bolsistas.begin();      // iterador para percorrer a estrutura set
-    for(it_n; it_n != nomes_bolsistas.end(); it_n++){
+    set<string>::iterator it_n;      // iterador para percorrer a estrutura set
+    for(it_n = nomes_bolsistas.begin(); it_n != nomes_bolsistas.end(); it_n++){
         input_escreve_arquivo+= *it_n + "\n";
     }
     lista_arquivos.open("lista_arquivos.txt");
@@ -818,16 +813,16 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
         }
 
         arq_apresentacao_oral.open("Apresentacao_Oral.txt");
-        set<string>::iterator it_o = apresentacao_oral.begin();      // iterador para percorrer a estrutura set
-        for(it_o; it_o != apresentacao_oral.end(); it_o++){
+        set<string>::iterator it_o;      // iterador para percorrer a estrutura set
+        for(it_o = apresentacao_oral.begin(); it_o != apresentacao_oral.end(); it_o++){
             input_apresentacao_oral+= *it_o + "\n";
         }
         arq_apresentacao_oral << input_apresentacao_oral;
         arq_apresentacao_oral.close();
 
         arq_apresentacao_poster.open("Apresentacao_Poster.txt");
-        set<string>::iterator it_p = apresentacao_poster.begin();      // iterador para percorrer a estrutura set
-        for(it_p; it_p != apresentacao_poster.end(); it_p++){
+        set<string>::iterator it_p;      // iterador para percorrer a estrutura set
+        for(it_p = apresentacao_poster.begin(); it_p != apresentacao_poster.end(); it_p++){
             input_apresentacao_poster+= *it_p + "\n";
         }
         arq_apresentacao_poster << input_apresentacao_poster;
