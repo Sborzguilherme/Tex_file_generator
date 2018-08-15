@@ -8,16 +8,21 @@ from unicodedata import normalize
 def getText(filename):
     doc = docx.Document(filename)
     fulltext =[]
-    for t in doc.paragraphs:
+    for t in doc.paragraphs:                                                            # All paragraphs
+        list_text=[]
         for run in t.runs:
             if run.italic:                                                              # Identify italic text
-                t.text = t.text.replace(run.text, '\\textit{'+run.text+'}')
+                if run.text != ' ' and run.text != "." and run.text != "," and run.text != ";":
+                    run.text = run.text.replace(run.text, '\\textit{'+run.text+'}')
             elif run.bold:                                                              # Identify Bold text
-                t.text = t.text.replace(run.text, '\\textbf{'+run.text+'}')
+                if run.text != ' ' and run.text != "." and run.text != "," and run.text != ";":
+                    run.text = run.text.replace(run.text, '\\textbd{'+run.text+'}')
             elif run.font.superscript:                                                  # Identify superscript text
-                t.text = t.text.replace(run.text, '\\textsuperscript{'+run.text+'}')
+                run.text = run.text.replace(run.text, '\\textsuperscript{'+run.text+'}')
             elif run.font.subscript:                                                    # Identify subscript text
-                t.text = t.text.replace(run.text, '\\textsubscript{'+run.text+'}')
+                run.text = run.text.replace(run.text, '\\textsubscript{'+run.text+'}')
+            list_text.append(run.text)
+        t.text = ''.join(list_text)
         fulltext.append(t.text)
     return '\n'.join(fulltext)
 

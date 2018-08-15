@@ -14,20 +14,20 @@ using namespace std;
 
 void Le_projetos(string arquivo, vector<Projeto> &vetor);               // Função para leitura do CSV
 void Escreve_projetos(vector<Projeto> vetor, string arquivos);          // Função para gerar arquivos .TEX
-string Trata_maiusculo_minusculo(string nome, bool palavra_chave);      // Primeira letra de cada palvra em maisculo
 vector<string> Trata_sobrenome(string sobrenome);                       // Encontra sobrenome e passa para maisculo
 string Nome_concatenado(vector<string> nomes);                          // Concatenação de vetor de strings
 string Transforma_maisculo_minusculo(string palavra, bool Maiusculo);   // Poe  string só em caixa alta ou baixa
+string Trata_maiusculo_minusculo(string nome, bool palavra_chave);      // Primeira letra de cada palvra em maisculo
 string Retira_ponto_final_espaco(string nome, bool palavra_chave);      // Retira ponto final e espaço do fim da string
 string Retira_acentuacao(string nome);                                  // Função para tratamento de strings acentuadas
 string Gera_string_arquivo_input(string inputs, int grande_area);       // Gera a string para arquivos de input
 string Define_escola(string sigla);                                     // Gera nome completo da escola a partir da sigla
 void Define_resumo(string diretorio, vector<Projeto>&vetor);            // Leitura de arquivos contendo resumo
 string Sobrenome_arquivo(string nome, string sobrenome);                // Retorna nome e sobrenome na formatação para escrita do arquivo
-const vector<string> Explode(const string& s, const char& c);           // Função para separação de strings
 void Cria_lista_arquivos(vector<Projeto>vetor);                         // Cria txt com nomes do arquivos.TEX
 void Le_CSV_resumo(string arquivo);                                     // Leitura do CSV vindo do formulário
 string Trata_autores_adicionais(vector<string> vetor_autores);          // Função para definição dos autores adicionais
+const vector<string> Explode(const string& s, const char& c);           // Função para separação de strings
 
 /*Função para leitura do arquivo CSV
     O vetor passado por referência é atualizado com os dados lidos do arquivo
@@ -577,7 +577,12 @@ string Define_escola(string sigla){
     else if(sigla == "CAU")  retorno = "Colégio de Aplicação Univali - CAU";
     return retorno;
 }
-// Função para set dos resumos
+/* Função para setar os resumos em cada um dos elementos do vetor
+   Os arquivos lidos são os .tex gerados pelo script em python
+   Nesta função, pega-se o atributo nome_completo_bolsista de cada elemento do vetor e tenta-se abrir o arquivo .tex
+   com este nome no diretório informado. Caso a abertura do arquivo aconteça, o conteúdo do arquivo é setado como
+   resumo daquele elemento.
+*/
 void Define_resumo(string diretorio, vector<Projeto>&vetor){
 
     string nome_padronizado, linha, resumo, input_sem_resumo="";
@@ -636,30 +641,6 @@ void Define_resumo(string diretorio, vector<Projeto>&vetor){
 /* Função que gera o nome dos arquivos de saída no formato "sobrenome_nome.tex"
     Parâmetros: Nome completo e sobrenome do bolsista (atribustos da classe)
 */
-/*string Sobrenome_arquivo(string nome_completo, string sobrenome_c){
-    vector<string> identifica_nome, v_sobrenome;
-    string nome, sobrenome;
-    identifica_nome = Explode(nome_completo, ' ');              // Nomes separados
-    v_sobrenome = Explode(sobrenome_c, ' ');                      // Sobrenomes separados
-
-    nome = identifica_nome.front();                             // Primeiro Nome
-    nome = Retira_ponto_final_espaco(nome, false);              // Retira espaços
-    nome = Retira_acentuacao(nome);                             // Retira acentos (será usado como nome do arquivo)
-    nome = Transforma_maisculo_minusculo(nome, false);          // Passa para minúsculo
-
-    if(v_sobrenome.size()==1){                                  // Se houver um sobrenome
-        sobrenome = v_sobrenome.at(0);
-    }else{                                                      // Se houver 2 sobrenomes
-        sobrenome = v_sobrenome.at(0) + "_" + v_sobrenome.at(1);
-    }
-
-    sobrenome = Retira_ponto_final_espaco(sobrenome, false);
-    sobrenome = Retira_acentuacao(sobrenome);
-    sobrenome = Transforma_maisculo_minusculo(sobrenome,false);
-
-    return (sobrenome + "_" + nome);
-}*/
-
 string Sobrenome_arquivo(string nome, string sobrenome_c){
 
     vector<string> identifica_nome, v_sobrenome;
@@ -693,6 +674,10 @@ string Sobrenome_arquivo(string nome, string sobrenome_c){
     return retorno;
 }
 
+/*  Função para criar um txt listando o nome de todos os bolsistas (Formatação : sobrenome_nome)
+ *  Esse txt é necessário para utilizar o arquivo doc_r.py (Formulário do Google sendo utilizado)
+ *  Com a utilização do sistema ELIS este arquivo é utilizado como controle da saída do sistema
+*/
 void Cria_lista_arquivos(vector<Projeto>vetor){
     // Cria txt com todos os nomes de arquivos que serão criados
     ofstream lista_arquivos;
@@ -720,16 +705,6 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
         }
         nomes_utilizados.insert(nome_padronizado);  // Adiciona nome ao set
 
-        /*// Percorre toda a lista para encontrar o nome do arquivo
-        for(int i=0; i<vetor_nome_arquivos.size();i++){
-            if(nome_padronizado == vetor_nome_arquivos.at(i)){
-                vetor_nome_arquivos.erase(vetor_nome_arquivos.begin()+i);
-            }else if((nome_padronizado+"_2") == vetor_nome_arquivos.at(i)){
-                vetor_nome_arquivos.erase(vetor_nome_arquivos.begin()+i);
-                nome_padronizado+="_2";
-            }
-        }*/
-
         nomes_bolsistas.insert(nome_padronizado);
 
         //input_escreve_arquivo = Sobrenome_arquivo(projeto_atual.getBolsista_nome_completo(), projeto_atual.getBolsista_sobrenome());
@@ -741,13 +716,14 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
     for(it_n = nomes_bolsistas.begin(); it_n != nomes_bolsistas.end(); it_n++){
         input_escreve_arquivo+= *it_n + "\n";
     }
+    // Formulário do Google
     lista_arquivos.open("lista_arquivos.txt");
     lista_arquivos << input_escreve_arquivo;
     lista_arquivos.close();
 
 }
 /* Função para leitura do CSV vindo do Formulário
- * Parâmetros -> Local do arquivo, Vetor de projetos passado por referência
+ * Parâmetros -> (Local do arquivo, Vetor de projetos passado por referência)
 */
 void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
 
@@ -827,11 +803,10 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
         }
         arq_apresentacao_poster << input_apresentacao_poster;
         arq_apresentacao_poster.close();
-
 }
 
 /*  Função que retorna a string de autores adicionais pronta para escrita no arquivo
- *  Parâmetro -> Vetor em que cada posição possui o nome completo de um autor adicional
+ *  Parâmetro -> Vetor em que cada posição possui o nome completo de um autor adicional(string lida do csv, sem as aspas)
 */
 string Trata_autores_adicionais(vector<string> vetor_autores){
 
@@ -859,7 +834,7 @@ string Trata_autores_adicionais(vector<string> vetor_autores){
 /* Função de separação dos caracteres
     Parâmetros(String a ser separada, caractere usado para separação)
     Retorno da função: Vetor em que cada posição corresponde a um elemento diferente
-    (Elementos são definidos pelo caracter sepradador passado por parâmetro)
+    (Elementos são definidos pelo caracter separadador passado por parâmetro)
 */
 const vector<string> Explode(const string& s, const char& c){
     string buff{""};
