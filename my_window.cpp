@@ -73,8 +73,8 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     //string command = "venv\\Scripts\\python doc_r.py";
 
     // ELIS
-    string command = "venv\\Scripts\\python doc_r_ELIS.py";
-    command+=(" " + local_resumo);                                          // Adiciona Parte 3 do comando
+    string command = "venv\\Scripts\\python doc_r_ELIS.py";               // Comando para executavel
+    command+=(" " + local_resumo);                                        // Adiciona Parte 3 do comando
     system(command.c_str());
 
     /* Uso do WinExec

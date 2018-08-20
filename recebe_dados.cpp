@@ -758,23 +758,27 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
              * Coluna 6 -> Link do arquivo
             */
 
-            nome_bolsista_atual = Retira_ponto_final_espaco(csvColuna.at(2), false);
+            /* NOVO FORMATO
+               Coluna 0 -> Nome do bolsista
+               Coluna 1 -> Autores adicionais separados por vírgula
+            */
+
+            nome_bolsista_atual = Retira_ponto_final_espaco(csvColuna.at(0), false);
             nome_bolsista_atual = Trata_maiusculo_minusculo(nome_bolsista_atual, false);
 
             for(int i=0; i<vetor.size();i++){
                // cout<<vetor.at(i).getBolsista_nome_completo()<<endl;
                 if(vetor.at(i).getBolsista_nome_completo() == nome_bolsista_atual){
-                    vetor.at(i).setModo_apresentacao(Retira_ponto_final_espaco(csvColuna.at(5),false));
-                    if(csvColuna.at(4) !=""){
-                        vetor.at(i).setAutores_adicionais(Explode(csvColuna.at(4), ';'));   // Vetor com os autores
-                        //cout<<csvColuna.at(4)<<endl;
+                    //vetor.at(i).setModo_apresentacao(Retira_ponto_final_espaco(csvColuna.at(5),false));
+                    if(csvColuna.at(1) !="" || csvColuna.at(1) !="."){
+                        vetor.at(i).setAutores_adicionais(Explode(csvColuna.at(1), ';'));   // Vetor com os autores
                     }
                 }
             }
         }
     }
     file.close();
-
+    /*
     // Gera Arquivos txt separando alunos com apresentação oral e pôster
         ofstream arq_apresentacao_oral, arq_apresentacao_poster;
         set<string> apresentacao_oral, apresentacao_poster;
@@ -802,7 +806,7 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
             input_apresentacao_poster+= *it_p + "\n";
         }
         arq_apresentacao_poster << input_apresentacao_poster;
-        arq_apresentacao_poster.close();
+        arq_apresentacao_poster.close();*/
 }
 
 /*  Função que retorna a string de autores adicionais pronta para escrita no arquivo
