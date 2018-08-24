@@ -49,8 +49,6 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
         cout<<vetor_nome_arquivos.at(i)<<endl;
     }*/
 
-    Cria_lista_arquivos(vetor_projetos);                // Nomes dos arquivos que serão abertos pelo script em python
-
     string arquivo_teste_csv_form;
     arquivo_teste_csv_form = ui->file_line_4->text().toStdString();
     Le_CSV_resumo(arquivo_teste_csv_form, vetor_projetos);
@@ -83,6 +81,7 @@ void MyWindow::on_browse_button_clicked()   // Botão browse de leitura
     //WinExec(command.c_str(), SW_HIDE);  // Invoca o "cmd" sem que ele apareça
 
     Define_resumo(local_resumo+"\\tex", vetor_projetos);
+    Cria_lista_arquivos(vetor_projetos);                // Nomes dos arquivos (usado para controle)
 
     /*ofstream test_file;
     string test_string="";
@@ -123,21 +122,23 @@ void MyWindow::on_file_generate_button_clicked()
     // Pega os caminhos selecionados acima
     string diretorio_escrita = ui->file_line_2->text().toStdString();
 
-    string cria_dir_vida, cria_dir_hum, cria_dir_exa;
-    const char *dir_vida, *dir_humanas, *dir_exatas;
+    string cria_dir_vida, cria_dir_hum, cria_dir_exa, cria_dir_pos;
+    const char *dir_vida, *dir_humanas, *dir_exatas, *dir_pos;
 
     cria_dir_vida = diretorio_escrita + "/vida";
-    cria_dir_hum = diretorio_escrita + "/humanas";
-    cria_dir_exa = diretorio_escrita + "/exatas";
+    cria_dir_hum  = diretorio_escrita + "/humanas";
+    cria_dir_exa  = diretorio_escrita + "/exatas";
+    cria_dir_pos  = diretorio_escrita + "/pos";
     //vector <Projeto> vetor_projetos;                                   // Vetor do tipo da classe "Projeto"
 
     dir_vida = cria_dir_vida.c_str();
     dir_humanas = cria_dir_hum.c_str();
     dir_exatas = cria_dir_exa.c_str();
+    dir_pos = cria_dir_pos.c_str();
 
     // Criação dos diretórios para armazenar os arquivos gerados
-    mkdir(dir_vida); mkdir(dir_humanas); mkdir(dir_exatas);
-    Escreve_projetos(this->getVetor_projetos(), diretorio_escrita);                // Escreve os dados do vetor em arquivos .TEX
+    mkdir(dir_vida); mkdir(dir_humanas); mkdir(dir_exatas); mkdir(dir_pos);
+    Escreve_projetos(this->getVetor_projetos(), diretorio_escrita);       // Escreve os dados do vetor em arquivos .TEX
     ui->label_end->setVisible(true);
 }
 

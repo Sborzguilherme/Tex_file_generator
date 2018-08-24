@@ -47,16 +47,17 @@ def latex_text(text):
     text = text.replace('≠', '$\\neq$')                     # Not-Equal
     text = text.replace('μ','$\\mu$')                       # Micro
     text = text.replace('±','$\\pm$')                       # More/Less
-    text = text.replace('Ɛ','$\\$\mathcal{E}$')             # Big epsilon
-    text = text.replace('≅','$\\$\cong$')                   # Approx (2)
+    text = text.replace('Ɛ','$\\mathcal{E}$')               # Big epsilon
+    text = text.replace('≅','$\\cong$')                     # Approx (2)
+    text = text.replace('א','$\\chi$')                      # Chi
 
     return text
 
 def remover_acentos(txt):
     return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
-#diretorio = 'C:/Users/Guilherme/Documents/Univali/CSV_ARQUIVOS/GUI/Arquivos/Arquivos_resumo/' # Deve ser trocado para argumento passado por parâmetro
-diretorio = sys.argv[1] + '\\'
+diretorio = 'C:/Users/Guilherme/Documents/Univali/CSV_ARQUIVOS/GUI/Arquivos/Arquivos_resumo/' # Deve ser trocado para argumento passado por parâmetro
+#diretorio = sys.argv[1] + '\\'
 
 files = glob.glob(diretorio+'*.docx')   # Tenta abrir todos os arquivos docx
 for name in files:                      # Percorre todos os arquivos docx na pasta informada
@@ -82,7 +83,7 @@ for name in files:                      # Percorre todos os arquivos docx na pas
 files_tex = glob.glob(diretorio+'*.tex')        # Tenta abrir todos os arquivos docx
 for name_tex in files_tex:                      # Percorre todos os arquivos docx na pasta informada
     try:
-        with open(name_tex) as f_tex:
+        with codecs.open(name_tex,'rb',encoding='utf8') as f_tex:
             resumo=""                                                           # Limpa as strings
             nome_arq_escrita=""
             resumo = f_tex.read()                                               # Pega o conteúdo do arquivo

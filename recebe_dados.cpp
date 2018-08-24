@@ -49,7 +49,6 @@ void Le_projetos(string arquivo, vector<Projeto> &vetor){   // Vetor é passado 
     vector<string> nome_orientador;             // Vetor que recebe nomes separados do orientador
     vector<string>vetor_nome_projeto;           // Vetor que identifica o projeto de pesquisa
     int i=0;
-
     while(getline(file, csvLinha)){
         if(linha_controle == 0){                            // Primeira linha (Título do projeto de pesquisa)
             vetor_nome_projeto = Explode(csvLinha, ';');
@@ -135,7 +134,7 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
     string nome_arquivo, area_apresentacao, escreve_input, escola;      // String auxiliares
     stringstream concatena; // Variável utilizada para concatenação de strings (podem ser utilizados meétodos diferentes para concatenação)
     vector<string> identifica_nome;                            // Vetores auxiliares
-    set<string>s_vida, s_humanas, s_exatas, nomes_utilizados;   // Estruturas para ordenação dos autores por grande área
+    set<string>s_vida, s_humanas, s_exatas, nomes_utilizados, s_pos;   // Estruturas para ordenação dos autores por grande área
     Projeto escrita;
 
     //static vector<string> nomes_utilizados;
@@ -154,6 +153,12 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         area_apresentacao = Transforma_maisculo_minusculo(area_apresentacao, false);
 
         escola = Retira_ponto_final_espaco(escrita.getEscola(), false);
+        string escrita_escola;
+
+        if(escola!="."){
+            escrita_escola = escola;
+        }else escrita_escola = "";
+
         string escrita_autores_adicionais;
 
         if(escrita.getAutores_adicionais().empty()){
@@ -184,32 +189,32 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
 
         // Definição do formato do arquivo .TEX
         arquivo_escrita <<"\\begin{conf-abstract}\n"
-                        <<"% Título\n"
-                        <<"{" << Retira_ponto_final_espaco(escrita.getTitulo(), false) << "}\n"
-                        <<"% Autores\n"
-                        <<"{" << Retira_ponto_final_espaco(escrita.getBolsista_sobrenome(), false) << ", "
-                        << Retira_ponto_final_espaco(escrita.getBolsista_nome(), false) << "; "
-                        << escrita_autores_adicionais
-                        << Retira_ponto_final_espaco(escrita.getOrientador_sobrenome(), false)
-                        << ", " << Retira_ponto_final_espaco(escrita.getOrientador_nome(), false) << "}\n"
-                        << "% Curso\n"
-                        << "{" << Retira_ponto_final_espaco(escrita.getCurso(),false) << "}\n"
-                        <<"% Escola\n"
-                        << "{" << Define_escola(escola) << "}\n"
-                        << "% Área\n"
-                        << "{" << Retira_ponto_final_espaco(escrita.getArea(), false)<< "}\n"
-                        << "% Resumo\n"
-                        << "{" << escrita.getResumo()<<"}\n"
-                        //<<"{\\blindtext[5][1]}\n"
-                        << "% Palavras-chave\n"
-                        << "{" << Retira_ponto_final_espaco(escrita.getPalavra_chave(), true)
-                        << "}\n"
-                        << "% Programa de pesquisa\n"
-                        << "{" << escrita.getTitulo_Projeto()<<"}\n"
-                        << "% Indexação dos autores\n"
-                        << "\\indexauthors{" << Retira_ponto_final_espaco(escrita.getBolsista_nome_completo(), false)
-                        <<", " << Retira_ponto_final_espaco(escrita.getOrientador_nome_completo(), false)<<"}\n"
-                        << "\\end{conf-abstract}";
+                       <<"% Título\n"
+                      <<"{" << Retira_ponto_final_espaco(escrita.getTitulo(), false) << "}\n"
+                     <<"% Autores\n"
+                    <<"{" << Retira_ponto_final_espaco(escrita.getBolsista_sobrenome(), false) << ", "
+                   << Retira_ponto_final_espaco(escrita.getBolsista_nome(), false) << "; "
+                   << escrita_autores_adicionais
+                   << Retira_ponto_final_espaco(escrita.getOrientador_sobrenome(), false)
+                   << ", " << Retira_ponto_final_espaco(escrita.getOrientador_nome(), false) << "}\n"
+                   << "% Curso\n"
+                   << "{" << Retira_ponto_final_espaco(escrita.getCurso(),false) << "}\n"
+                   <<"% Escola\n"
+                  << "{" << escrita_escola << "}\n"
+                  << "% Área\n"
+                  << "{" << Retira_ponto_final_espaco(escrita.getArea(), false)<< "}\n"
+                  << "% Resumo\n"
+                  << "{" << escrita.getResumo()<<"}\n"
+                     //<<"{\\blindtext[5][1]}\n" // Geração de parágrafos aleatórios no LaTeX
+                  << "% Palavras-chave\n"
+                  << "{" << Retira_ponto_final_espaco(escrita.getPalavra_chave(), true)
+                  << "}\n"
+                  << "% Programa de pesquisa\n"
+                  << "{" << escrita.getTitulo_Projeto()<<"}\n"
+                  << "% Indexação dos autores\n"
+                  << "\\indexauthors{" << Retira_ponto_final_espaco(escrita.getBolsista_nome_completo(), false)
+                  <<", " << Retira_ponto_final_espaco(escrita.getOrientador_nome_completo(), false)<<"}\n"
+                 << "\\end{conf-abstract}";
         vetor.erase(vetor.begin());         // Apaga a primeira posição do vetor
         arquivo_escrita.close();            // Fecha arquivo atual para abertura e escrita do próximo
 
@@ -224,7 +229,8 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
             // Aqui os alunos são separados por área e ordenados pela estrutura set
             if(area_apresentacao == "vida"){s_vida.insert(nome_arquivo);}
             else if(area_apresentacao == "humanas"){s_humanas.insert(nome_arquivo);}
-            else{s_exatas.insert(nome_arquivo);}
+            else if(area_apresentacao == "exatas"){s_exatas.insert(nome_arquivo);}
+            else(s_pos.insert(nome_arquivo));
         }
 
 
@@ -232,8 +238,8 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
 
 
     // Geração dos Arquivos de Input
-    ofstream vida, humanas, exatas;                             // Controle individual de cada arquivo
-    string input_vida ="", input_humanas="", input_exatas="";   // Strings para escrita das linhas de input
+    ofstream vida, humanas, exatas, pos;                             // Controle individual de cada arquivo
+    string input_vida ="", input_humanas="", input_exatas="", input_pos="";   // Strings para escrita das linhas de input
 
     // Após todas os nomes terem sido inseridos deve-se gerar a string para escrita no arquivo
     set<string>::iterator it_v;      // iterador para percorrer a estrutura set
@@ -249,11 +255,17 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         input_exatas+= "\\input{exatas/" + *it_e + "}\\clearpage\n";
     }
 
-    string dir_vida, dir_hum, dir_exa;
+    set<string>::iterator it_p;
+    for(it_p = s_pos.begin(); it_p != s_pos.end(); it_p++){
+        input_pos+= "\\input{pos/" + *it_p + "}\\clearpage\n";
+    }
+
+    string dir_vida, dir_hum, dir_exa, dir_pos;
 
     dir_vida = arquivo + "/grande_area_vida.tex";
     dir_hum  = arquivo + "/grande_area_humanas.tex";
     dir_exa  = arquivo + "/grande_area_exatas.tex";
+    dir_pos  = arquivo + "/pos.tex";
 
     // Com as strings de input concatenadas deve-se gerar os arquivos que receberão estes dados
     vida.open(dir_vida);
@@ -265,6 +277,9 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
     exatas.open(dir_exa);
     exatas<<Gera_string_arquivo_input(input_exatas, 2);
     exatas.close();
+    pos.open(dir_pos);
+    pos<<Gera_string_arquivo_input(input_pos, 3);
+    pos.close();
 }
 /* Função para tratar sobrenomes
    Parâmetro -> nome completo
@@ -559,7 +574,7 @@ string Gera_string_arquivo_input(string inputs, int grande_area){
     centro_Academico.push_back("CIÊNCIAS BIOLÓGICAS E DA SAÚDE");
     centro_Academico.push_back("LINGUÍSTICA, LETRAS E ARTES E CIÊNCIAS HUMANAS E SOCIAIS APLICADAS");
     centro_Academico.push_back("ENGENHARIAS E CIÊNCIAS AGRÁRIAS, EXATAS E DA TERRA");
-
+    centro_Academico.push_back("PROGRAMAS DE PÓS-GRADUAÇÃO");
     retorno = "\\pagestyle{empty}\n\\chapter{" + centro_Academico.at(grande_area) + "}\n" +
               "\\begin{figure}[!h]\n\t\\centering\n\t\\includegraphics[scale=1.3]{imagens/sciences.png}\n"+
               "\\end{figure}\n\\vfill\n\\hrule\n\\pagebreak\n\\pagestyle{fancy}\n\n" + inputs;
@@ -575,6 +590,7 @@ string Define_escola(string sigla){
     else if(sigla == "EE")   retorno = "Escola de Educação -- EE";
     else if(sigla == "EN")   retorno = "Escola de Negócios -- EN";
     else if(sigla == "CAU")  retorno = "Colégio de Aplicação Univali - CAU";
+    else retorno = "";
     return retorno;
 }
 /* Função para setar os resumos em cada um dos elementos do vetor
@@ -682,8 +698,8 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
     // Cria txt com todos os nomes de arquivos que serão criados
     ofstream lista_arquivos;
     Projeto projeto_atual;
-    set<string>nomes_bolsistas;
-    string input_escreve_arquivo, nome_padronizado;
+    set<string>nomes_bolsistas, bolsistas_sem_resumo;
+    string input_escreve_arquivo, nome_padronizado, input_sem_resumo;
     set<string> nomes_utilizados;
 
     //static vector<string> nomes_utilizados;
@@ -705,6 +721,10 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
         }
         nomes_utilizados.insert(nome_padronizado);  // Adiciona nome ao set
 
+        if(projeto_atual.getResumo()==""){
+            bolsistas_sem_resumo.insert(nome_padronizado);
+        }
+
         nomes_bolsistas.insert(nome_padronizado);
 
         //input_escreve_arquivo = Sobrenome_arquivo(projeto_atual.getBolsista_nome_completo(), projeto_atual.getBolsista_sobrenome());
@@ -719,6 +739,15 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
     // Formulário do Google
     lista_arquivos.open("lista_arquivos.txt");
     lista_arquivos << input_escreve_arquivo;
+    lista_arquivos.close();
+
+    set<string>::iterator it_s;      // iterador para percorrer a estrutura set
+    for(it_s = bolsistas_sem_resumo.begin(); it_s != bolsistas_sem_resumo.end(); it_s++){
+        input_sem_resumo+= *it_s + "\n";
+    }
+    // Formulário do Google
+    lista_arquivos.open("sem_resumo.txt");
+    lista_arquivos << input_sem_resumo;
     lista_arquivos.close();
 
 }
@@ -744,7 +773,7 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
             vector<string> csvColuna;               // Vetor cujo elementos são as colunas da linha do CSV
             string csvElemento;                     // Elemento da Coluna
 
-            while( getline(csvStream, csvElemento, ',') ){  // Separa itens na linha por ';'
+            while( getline(csvStream, csvElemento, ';') ){  // Separa itens na linha por ;,'
                 csvColuna.push_back(csvElemento);           // Cada elemento do vetor csvColuna é um item diferente
             }
             // Nesse ponto os elementos do CSV estão separados nas posições do vetor csvColuna;
@@ -771,7 +800,7 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
                 if(vetor.at(i).getBolsista_nome_completo() == nome_bolsista_atual){
                     //vetor.at(i).setModo_apresentacao(Retira_ponto_final_espaco(csvColuna.at(5),false));
                     if(csvColuna.at(1) !="" || csvColuna.at(1) !="."){
-                        vetor.at(i).setAutores_adicionais(Explode(csvColuna.at(1), ';'));   // Vetor com os autores
+                        vetor.at(i).setAutores_adicionais(Explode(csvColuna.at(1), ','));   // Vetor com os autores
                     }
                 }
             }
