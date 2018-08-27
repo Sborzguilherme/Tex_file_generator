@@ -131,7 +131,7 @@ void Le_projetos(string arquivo, vector<Projeto> &vetor){   // Vetor é passado 
 void Escreve_projetos(vector<Projeto> vetor, string arquivo){
 
     ofstream arquivo_escrita;                                           // Arquivo a ser aberto
-    string nome_arquivo, area_apresentacao, escreve_input, escola;      // String auxiliares
+    string nome_arquivo, area_apresentacao, escreve_input, template_arquivo;      // String auxiliares
     stringstream concatena; // Variável utilizada para concatenação de strings (podem ser utilizados meétodos diferentes para concatenação)
     vector<string> identifica_nome;                            // Vetores auxiliares
     set<string>s_vida, s_humanas, s_exatas, nomes_utilizados, s_pos;   // Estruturas para ordenação dos autores por grande área
@@ -152,12 +152,19 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         area_apresentacao = Retira_ponto_final_espaco(escrita.getArea_apresentacao(), false);
         area_apresentacao = Transforma_maisculo_minusculo(area_apresentacao, false);
 
-        escola = Retira_ponto_final_espaco(escrita.getEscola(), false);
+        if(area_apresentacao == "pos"){
+            template_arquivo = "Pos-Graduacao";
+        }else{
+            template_arquivo = "conf-abstract";
+        }
+
         string escrita_escola;
 
-        if(escola!="."){
-            escrita_escola = escola;
-        }else escrita_escola = "";
+        if(escrita.getEscola().empty()){
+            escrita_escola = "";
+        }else{
+            escrita_escola = Retira_ponto_final_espaco(escrita.getEscola(), false);
+        }
 
         string escrita_autores_adicionais;
 
@@ -188,7 +195,7 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         arquivo_escrita.open(concatena.str());
 
         // Definição do formato do arquivo .TEX
-        arquivo_escrita <<"\\begin{conf-abstract}\n"
+        arquivo_escrita <<"\\begin{" << template_arquivo <<"}\n"
                        <<"% Título\n"
                       <<"{" << Retira_ponto_final_espaco(escrita.getTitulo(), false) << "}\n"
                      <<"% Autores\n"
@@ -214,7 +221,7 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
                   << "% Indexação dos autores\n"
                   << "\\indexauthors{" << Retira_ponto_final_espaco(escrita.getBolsista_nome_completo(), false)
                   <<", " << Retira_ponto_final_espaco(escrita.getOrientador_nome_completo(), false)<<"}\n"
-                 << "\\end{conf-abstract}";
+                 << "\\end{"<<template_arquivo<<"}";
         vetor.erase(vetor.begin());         // Apaga a primeira posição do vetor
         arquivo_escrita.close();            // Fecha arquivo atual para abertura e escrita do próximo
 

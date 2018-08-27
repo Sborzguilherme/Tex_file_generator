@@ -56,6 +56,17 @@ def latex_text(text):
 def remover_acentos(txt):
     return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
+# String to remove invalid chars from name (First line input in the resume file)
+def remove_espaco_ponto_fim_string(palavra):
+    verify = True
+    while(verify):
+        if palavra[len(palavra)-1]  == " " or palavra[len(palavra)-1]  == ".":
+            palavra = palavra[:-1]
+        else:
+            verify = False
+    return palavra
+
+
 diretorio = 'C:/Users/Guilherme/Documents/Univali/CSV_ARQUIVOS/GUI/Arquivos/Arquivos_resumo/' # Deve ser trocado para argumento passado por parâmetro
 #diretorio = sys.argv[1] + '\\'
 
@@ -69,6 +80,7 @@ for name in files:                      # Percorre todos os arquivos docx na pas
             lista = resumo.split('\n')                                          # Separa as linhas em uma lista
             nome_arq_escrita = remover_acentos(lista[0])
             nome_arq_escrita = nome_arq_escrita.lower()
+            nome_arq_escrita = remove_espaco_ponto_fim_string(nome_arq_escrita) # Remove spaces and end periods
             nome_arq_escrita = diretorio+'/tex/'+nome_arq_escrita+ '.tex'       # Primeira posição da lista é sempre o nome do aluno
             if lista[1] == "":                                                  # Verificar em qual linha está o resumo
                 resumo = lista[2]
