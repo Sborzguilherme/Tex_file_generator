@@ -50,6 +50,9 @@ def latex_text(text):
     text = text.replace('Ɛ','$\\mathcal{E}$')               # Big epsilon
     text = text.replace('≅','$\\cong$')                     # Approx (2)
     text = text.replace('א','$\\chi$')                      # Chi
+    text = text.replace('ω','$\\omega$')                    # omega
+    text = text.replace('Ω','$\\Omega$')                    # Omega
+    text = text.replace('®','\\textsuperscript{®}')         # Registered mark
 
     return text
 

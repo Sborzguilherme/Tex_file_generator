@@ -86,15 +86,12 @@ void Le_projetos(string arquivo, vector<Projeto> &vetor){   // Vetor é passado 
 
                 // Definição do título do projeto de pesquisa (bolsa)
                  novo_projeto.setTitulo_Projeto(nome_projeto);;
-
                  // Determinação dos atributos a partir de cada coluna do arquivo CSV
                 novo_projeto.setCodigo(csvColuna.at(0));
                 // Nome completo do bolsista
                 novo_projeto.setBolsista_nome_completo(Trata_maiusculo_minusculo(csvColuna.at(1), false));
-
                 // Vetor identificando separação entre nome e sobrenome
                 nome_bolsista = Trata_sobrenome(csvColuna.at(1));
-
                 // Sobrenome em letras maisculas
                 novo_projeto.setBolsista_sobrenome(nome_bolsista.at(1));                // Define sobrenome
                 // Nomes restantes em letra minuscula definem o nome do bolsista
@@ -114,8 +111,8 @@ void Le_projetos(string arquivo, vector<Projeto> &vetor){   // Vetor é passado 
                 novo_projeto.setArea((Trata_maiusculo_minusculo(csvColuna.at(5), false)));
                 // Palavra-Chave (Tratada como uma só string)
                 novo_projeto.setPalavra_chave(Trata_maiusculo_minusculo(csvColuna.at(6), true));
-                // Escola
-                novo_projeto.setEscola(Transforma_maisculo_minusculo(csvColuna.at(7), true));
+                // Escola 
+                novo_projeto.setEscola(Define_escola(Transforma_maisculo_minusculo(csvColuna.at(7), true)));
                 // Área de apresentação (Grande área)
                 novo_projeto.setArea_apresentacao(Trata_maiusculo_minusculo(csvColuna.at(8), false));
                 vetor.push_back(novo_projeto);  // Adiciona o novo projeto criado ao vetor de projetos
@@ -130,16 +127,14 @@ void Le_projetos(string arquivo, vector<Projeto> &vetor){   // Vetor é passado 
 */
 void Escreve_projetos(vector<Projeto> vetor, string arquivo){
 
-    ofstream arquivo_escrita;                                           // Arquivo a ser aberto
-    string nome_arquivo, area_apresentacao, escreve_input, template_arquivo;      // String auxiliares
+    ofstream arquivo_escrita;                                                       // Arquivo a ser aberto
+    string nome_arquivo, area_apresentacao, escreve_input, template_arquivo;        // String auxiliares
     stringstream concatena; // Variável utilizada para concatenação de strings (podem ser utilizados meétodos diferentes para concatenação)
-    vector<string> identifica_nome;                            // Vetores auxiliares
+    vector<string> identifica_nome;                                                 // Vetores auxiliares
     set<string>s_vida, s_humanas, s_exatas, nomes_utilizados, s_pos;   // Estruturas para ordenação dos autores por grande área
     Projeto escrita;
 
-    //static vector<string> nomes_utilizados;
-
-    while (!vetor.empty()) { /* A cada iteraçã lê-se uma posição do vetor gerando um arquivo .TEX para a mesma. As
+    while (!vetor.empty()){ /* A cada iteraçã lê-se uma posição do vetor gerando um arquivo .TEX para a mesma. As
                              posições lidas são retiradas do vetor. Processo se repete até que o mesmo esteja vazio*/
 
         escrita = vetor.at(0);                  // Recebe vetor na primeira posição
@@ -169,14 +164,14 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         string escrita_autores_adicionais;
 
         if(escrita.getAutores_adicionais().empty()){
+            cout<<escrita.getBolsista_nome_completo()<<endl;
             escrita_autores_adicionais = "";
         }else{
             escrita_autores_adicionais = "";        // Limpa a string
             escrita_autores_adicionais = Trata_autores_adicionais(escrita.getAutores_adicionais());
             //escrita_autores_adicionais = Retira_ponto_final_espaco(escrita_autores_adicionais, false);
         }
-
-        concatena.str("");  // Zera a string que define o nome do arquivo para a próxima iteração
+        concatena.str("");  // Reseta a string que define o nome do arquivo para a próxima iteração
         nome_arquivo = Sobrenome_arquivo(escrita.getBolsista_nome(), escrita.getBolsista_sobrenome());
 
         if(!nomes_utilizados.empty()){
@@ -231,18 +226,14 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
         escreve_input.replace(escreve_input.begin(), escreve_input.begin()+arquivo.length()+1, ""); // Exclui o caminho inicial
         // A variável escreve_input recebe apenas a parte contendo o "sobrenome_primeiroNome" do diretório
 
-
-        if(escrita.getResumo()!=""){    // Só acrescenta no arquivo de input aqueles que enviaram resumo
+        if(!escrita.getResumo().empty()){    // Só acrescenta no arquivo de input aqueles que enviaram resumo
             // Aqui os alunos são separados por área e ordenados pela estrutura set
             if(area_apresentacao == "vida"){s_vida.insert(nome_arquivo);}
             else if(area_apresentacao == "humanas"){s_humanas.insert(nome_arquivo);}
             else if(area_apresentacao == "exatas"){s_exatas.insert(nome_arquivo);}
             else(s_pos.insert(nome_arquivo));
         }
-
-
     }// End While
-
 
     // Geração dos Arquivos de Input
     ofstream vida, humanas, exatas, pos;                             // Controle individual de cada arquivo
@@ -253,20 +244,22 @@ void Escreve_projetos(vector<Projeto> vetor, string arquivo){
     for(it_v = s_vida.begin(); it_v != s_vida.end(); it_v++){
         input_vida+= "\\input{vida/" + *it_v + "}\\clearpage\n";
     }
+    //cout<<"INPUT VIDA"<<input_vida<<endl;
     set<string>::iterator it_h;
     for(it_h = s_humanas.begin(); it_h != s_humanas.end(); it_h++){
         input_humanas+= "\\input{humanas/" + *it_h + "}\\clearpage\n";
     }
+     //cout<<"INPUT HUMANAS"<<input_humanas<<endl;
     set<string>::iterator it_e;
     for(it_e = s_exatas.begin(); it_e != s_exatas.end(); it_e++){
         input_exatas+= "\\input{exatas/" + *it_e + "}\\clearpage\n";
     }
-
+    //cout<<"INPUT EXATAS"<<input_exatas<<endl;
     set<string>::iterator it_p;
     for(it_p = s_pos.begin(); it_p != s_pos.end(); it_p++){
         input_pos+= "\\input{pos/" + *it_p + "}\\clearpage\n";
     }
-
+    //cout<<"INPUT POS"<<input_pos<<endl;
     string dir_vida, dir_hum, dir_exa, dir_pos;
 
     dir_vida = arquivo + "/grande_area_vida.tex";
@@ -743,7 +736,7 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
     for(it_n = nomes_bolsistas.begin(); it_n != nomes_bolsistas.end(); it_n++){
         input_escreve_arquivo+= *it_n + "\n";
     }
-    // Formulário do Google
+    // Escreve nome de todos os arquivos gerados
     lista_arquivos.open("lista_arquivos.txt");
     lista_arquivos << input_escreve_arquivo;
     lista_arquivos.close();
@@ -752,7 +745,7 @@ void Cria_lista_arquivos(vector<Projeto>vetor){
     for(it_s = bolsistas_sem_resumo.begin(); it_s != bolsistas_sem_resumo.end(); it_s++){
         input_sem_resumo+= *it_s + "\n";
     }
-    // Formulário do Google
+    // Escreve nome dos arquivos que não possuem resumo
     lista_arquivos.open("sem_resumo.txt");
     lista_arquivos << input_sem_resumo;
     lista_arquivos.close();
@@ -768,13 +761,13 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
     int linha_controle = 0;                     // Variável para garantir que a linha de labels do CSV seja ignorada
 
     if(!file.is_open()){                        // Caso o arquivo a ser aberto não seja encontrado
-            cout << "Arquivo não encontrado!\n";
+            cout << "Arquivo c/ autores adicionais nao encontrado!\n";
             return;
          }
 
     while(getline(file, csvLinha)){
         if(linha_controle == 0){
-            linha_controle++;                   // Pula primeira linha (Labels)
+            linha_controle++;                       // Pula primeira linha (Labels)
         }else{
             istringstream csvStream(csvLinha);      // Recebe uma linha completa do CSV
             vector<string> csvColuna;               // Vetor cujo elementos são as colunas da linha do CSV
@@ -784,15 +777,6 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
                 csvColuna.push_back(csvElemento);           // Cada elemento do vetor csvColuna é um item diferente
             }
             // Nesse ponto os elementos do CSV estão separados nas posições do vetor csvColuna;
-            /* FORMATO DO CSV
-             * Coluna 0 -> Data e Hora - Pode ser descartada
-             * Coluna 1 -> Email do bolsista - Pode ser descartado
-             * Coluna 2 -> Nome completo do bolsista (Usar esta informação para saber qual posição do vetor deve ser alterada)
-             * Coluna 3 -> Nome completo do orientador
-             * Coluna 4 -> Autores adicionais separados por ponto-e-vírgula
-             * Coluna 5 -> Modo de Apresentação
-             * Coluna 6 -> Link do arquivo
-            */
 
             /* NOVO FORMATO
                Coluna 0 -> Nome do bolsista
@@ -802,11 +786,9 @@ void Le_CSV_resumo(string arquivo, vector<Projeto>&vetor){
             nome_bolsista_atual = Retira_ponto_final_espaco(csvColuna.at(0), false);
             nome_bolsista_atual = Trata_maiusculo_minusculo(nome_bolsista_atual, false);
 
-            for(int i=0; i<vetor.size();i++){
-               // cout<<vetor.at(i).getBolsista_nome_completo()<<endl;
+            for(unsigned int i=0; i<vetor.size();i++){
                 if(vetor.at(i).getBolsista_nome_completo() == nome_bolsista_atual){
-                    //vetor.at(i).setModo_apresentacao(Retira_ponto_final_espaco(csvColuna.at(5),false));
-                    if(csvColuna.at(1) !="" || csvColuna.at(1) !="."){
+                    if(csvColuna.at(1) !="" && csvColuna.at(1) !="."){
                         vetor.at(i).setAutores_adicionais(Explode(csvColuna.at(1), ','));   // Vetor com os autores
                     }
                 }
@@ -853,15 +835,23 @@ string Trata_autores_adicionais(vector<string> vetor_autores){
     if(vetor_autores.empty()){             // Caso não possua autores adicionais
         return "";
     }else{
-       vector<string> nomes_autor_atual;
-       string nome, sobrenome, retorno="";
-       //int controle = 0;
+       vector<string> nomes_autor_atual, aux;
+       string nome, sobrenome, retorno="", primeiro_autor_adicional;
 
        while(!vetor_autores.empty()){
 
-            nomes_autor_atual = Trata_sobrenome(vetor_autores.front());       // Pega primeira posição
-            nome = Retira_ponto_final_espaco(nomes_autor_atual.at(0),false);
-            sobrenome = Retira_ponto_final_espaco(nomes_autor_atual.at(1),false);
+           // primeiro_autor_adicional = vetor_autores.front();
+            //aux = Explode(primeiro_autor_adicional,' ');
+            //nome = aux.front();
+            //sobrenome = "";
+
+            //if(aux.size()>1){
+
+                nomes_autor_atual = Trata_sobrenome(vetor_autores.front());       // Pega primeira posição
+                nome = Retira_ponto_final_espaco(nomes_autor_atual.at(0),false);
+                sobrenome = Retira_ponto_final_espaco(nomes_autor_atual.at(1),false);
+            //}
+
 
             retorno += sobrenome + ", " + nome + "; ";
 
