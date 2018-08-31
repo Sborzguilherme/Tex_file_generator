@@ -85,7 +85,7 @@ for name in files:                      # Percorre todos os arquivos docx na pas
             nome_arq_escrita = nome_arq_escrita.lower()
             nome_arq_escrita = remove_espaco_ponto_fim_string(nome_arq_escrita) # Remove spaces and end periods
             nome_arq_escrita = diretorio+'/tex/'+nome_arq_escrita+ '.tex'       # Primeira posição da lista é sempre o nome do aluno
-            if lista[1] == "":                                                  # Verificar em qual linha está o resumo
+            if lista[1] == "" or lista[2] == " ":                               # Verificar em qual linha está o resumo
                 resumo = lista[2]
             else:
                 resumo = lista[1]
